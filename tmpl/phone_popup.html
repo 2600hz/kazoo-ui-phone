@@ -1,0 +1,53 @@
+<div id="div_popup">
+    <style>
+    	#photo{
+    		height: ${phone_data.image.height}px;
+            max-width: 720px;
+    		width: ${phone_data.image.width}px;
+    		background-image:url('${phone_data.image.base64}');
+    	}
+    </style>
+    <div class="inner">
+        <form id="provision-form" action="" method="post" class="niceform">
+            <ul class="settings_tabs settings1">
+                <li><a href="javascript:void(0)">Provisioning</a></li>
+            </ul>
+
+            <div class="clear"></div>
+
+            <div class="pane">
+                <div id="basic_settings">
+                     <div id="main">
+                        <div id="text"></div>
+                        {{if isAdmin}}
+                            <div>
+                                Name: <input id="template_description" type="text" value="${phone_data.name}"></input>
+                            </div>
+                        {{/if}}
+                        <div id="photo" class="ui-widget-content ui-corner-all"></div>
+                        <span id="move_update"></span>
+                        <span id="size_update"></span>
+                        <script>
+                           // getExistingResizables(function(data){data = $.parseJSON(data);$.each(data, function(){addExistingResizables(this);});});
+                        </script>
+                    </div>
+
+                    <div class="clear"></div>
+                </div> <!-- end basic settings -->
+
+            </div>
+
+            <div class="clear"></div>
+
+            </div>
+            <div class="buttons_wrapper">
+                <ul class="buttons">
+                    <li><a class="phone-update save-btn" href="javascript:void(0)">Update</a></li>
+                    {{if isAdmin}}
+                        <li><a class="phone-delete delete-btn" href="javascript:void(0)">Delete</a></li>
+                    {{/if}}
+                </ul>
+
+            </div>
+        </form>
+    </div>

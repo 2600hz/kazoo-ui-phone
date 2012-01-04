@@ -1,0 +1,35 @@
+<div>
+    <div class="inner">
+        <form id="phone-form" action="" method="post" class="niceform">
+            <div style="margin-top: 15px; margin-left: 35px">
+                <label for="template_name">Template Name:</label>
+                <input type="text" name="template_name" id="template_name"></input>
+                <br/>
+                <br/>
+
+                <label for="device_brand">Device Brand:</label>
+                <select style="max-width: 150px" name="brand" id="brand">
+                    {{each(brand, product_list) data.list_model}}
+                        <option id="${brand}" value="${brand}">${brand.charAt(0).toUpperCase() + brand.slice(1)}</option>
+                    {{/each}}
+                </select>
+                <br/>
+                <br/>
+
+                <label for="device_model">Device Model:</label>
+                <select style="width: 150px" name="model_select" id="model_select">
+                    {{each(brand, product_list) data.list_model}}
+                        {{each(product, model_list) product_list}}
+                            <optgroup class="model ${brand}" label="${product}">
+                                {{each(i, model) model_list}}
+                                    <option class="model ${brand}" value="${brand}_${product}_${model}" id="${brand}_${product}_${model}">${model}</option>
+                                {{/each}}
+                            </optgroup>
+                        {{/each}}
+                    {{/each}}
+                </select>
+            </div>
+            <div class="clear"></div>
+        </form>
+    </div>
+</div>

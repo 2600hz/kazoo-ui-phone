@@ -1,0 +1,15 @@
+<div>
+    <span>
+        <select id="dropdown" name="provision.id">
+            <option value="">-- Not set --</option>
+            {{each data}}
+                {{if id == field_data.selected_id}}
+                <option value="${this.id}" selected="selected">${this.name}</option>
+                {{else}}
+                <option value="${this.id}">${this.name}</option>
+                {{/if}}
+            {{/each}}
+        </select>
+        <input id="btn_provision_popup" type="button" value="Keys bindings"></input>
+    </span>
+</div>
