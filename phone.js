@@ -1,5 +1,3 @@
-var maxId = 0;
-
 winkstart.module('voip', 'phone', {
     css: ['css/style.css'],
     templates: {
@@ -25,37 +23,37 @@ winkstart.module('voip', 'phone', {
 
     resources: {
         'phone.update_template': {
-            url: '{api_url}/accounts/{account_id}/provision_tmpls/{phone_id}',
+            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}',
             contentType: 'application/json',
             verb: 'POST'
         },
         'phone.update_template_noimg': {
-            url: '{api_url}/accounts/{account_id}/provision_tmpls/{phone_id}?withoutimage=true',
+            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}?withoutimage=true',
             contentType: 'application/json',
             verb: 'POST'
         },
         'phone.delete_template': {
-            url: '{api_url}/accounts/{account_id}/provision_tmpls/{phone_id}',
+            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}',
             contentType: 'application/json',
             verb: 'DELETE'
         },
         'phone.create': {
-           url: '{api_url}/accounts/{account_id}/provision_tmpls',
+           url: '{api_url}/accounts/{account_id}/provisioner_templates',
             contentType: 'application/json',
             verb: 'PUT'
         },
         'phone.get_template': {
-            url: '{api_url}/accounts/{account_id}/provision_tmpls/{phone_id}',
+            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}',
             contentType: 'application/json',
             verb: 'GET'
         },
         'phone.get_template_noimg': {
-            url: '{api_url}/accounts/{account_id}/provision_tmpls/{phone_id}?withoutimage=true',
+            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}?withoutimage=true',
             contentType: 'application/json',
             verb: 'GET'
         },
         'phone.list_template': {
-            url: '{api_url}/accounts/{account_id}/provision_tmpls',
+            url: '{api_url}/accounts/{account_id}/provisioner_templates',
             contentType: 'application/json',
             verb: 'GET'
         }
@@ -63,13 +61,15 @@ winkstart.module('voip', 'phone', {
 }, function (args) {
     winkstart.registerResources(this.__whapp, this.config.resources);
 
-    winkstart.publish('subnav.add', {
-        whapp: 'voip',
-        module: this.__module,
-        label: 'Provisioning',
-        icon: 'outlet1',
-        weight: '99'
-    });
+    if('ui_flags' in winkstart.apps.voip && winkstart.apps.voip.ui_flags.provision_admin) {
+        winkstart.publish('subnav.add', {
+            whapp: 'voip',
+            module: this.__module,
+            label: 'Provisioning',
+            icon: 'outlet1',
+            weight: '99'
+        });
+    }
 },
 
 {
@@ -111,7 +111,7 @@ winkstart.module('voip', 'phone', {
                     data: thisPhone
                 },
                 function (_data, status) {
-                    winkstart.publish('phone.edit', {id: _data.data.id });
+                    winkstart.publish('phone.edit', { id: _data.data.id });
                     winkstart.publish('phone.list');
                 }
             );
@@ -152,9 +152,9 @@ winkstart.module('voip', 'phone', {
                     var id = $('#dropdown').val();
 
                     if(id) {
-                        console.log(provision_data);
                         THIS.edit_popup({
                             id: id,
+                            prevent_box_creation: true,
                             data: provision_data
                         });
                     }
@@ -180,7 +180,6 @@ winkstart.module('voip', 'phone', {
     edit_popup: function (args) {
         var THIS = this;
 
-        console.log(args);
         winkstart.request(true, 'phone.get_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
@@ -230,16 +229,18 @@ winkstart.module('voip', 'phone', {
                     addExistingResizables(this, B, true, false);
                 });
 
-                $('#photo', dialog).dblclick(function(event) {
-                    addResizable(event, B, true, false);
-                });
-
                 $('.phone-update', dialog).click(function() {
                     //MAJ object
                     $.extend(args.data, THIS.crazy_clean(B));
 
                     dialog.dialog('destroy').remove()
                 });
+
+                if(args.prevent_box_creation == undefined || args.prevent_box_creation == false) {
+                    $('#photo', dialog).dblclick(function(event) {
+                        addResizable(event, B, true, false);
+                    });
+                }
             }
         );
 
@@ -333,11 +334,11 @@ winkstart.module('voip', 'phone', {
                     addExistingResizables(this, A, true, true);
                 });
 
-                //initResizable();
-
-                $('#photo').dblclick(function(event) {
-                    addResizable(event, A, true, true);
-                });
+                if(args.prevent_box_creation == undefined || args.prevent_box_creation == false) {
+                    $('#photo').dblclick(function(event) {
+                        addResizable(event, A, true, true);
+                    });
+                }
 
                 var details = '&brand=' + A.properties.brand + '&product=' + A.properties.product + '&model=' + A.properties.model;
 
@@ -457,6 +458,7 @@ winkstart.module('voip', 'phone', {
             }
         });
 
+        //TODO JR: why brand yealink
         var brand = 'yealink'; // initialization_value
         $('#brand', add_template_html).val(brand);
         $('.model', add_template_html).not('.' + brand).hide();
@@ -498,7 +500,8 @@ function ucwords(str) {
 
 function addExistingResizables(data, phone_data, admin, set_default) { //Uses data from DB to add each resizable
     console.log('addExistingResizables');
-    var i = data.id;
+    var i = parseFloat(data.id);
+    var maxId = parseFloat($('#photo').dataset('maxId'));
 
     if (i != '') {
         var width = data.w,
@@ -508,9 +511,16 @@ function addExistingResizables(data, phone_data, admin, set_default) { //Uses da
             title = (data.title ? data.title : ''),
             id = 'resizable_' + i;
 
-        maxId = (i > maxId ? i : maxId);
+        if(i > maxId) {
+            $('#photo').attr('data-maxId', i);
+        }
+
 
         $('#photo').prepend('<div id="' + id + '" class="resizable ui-widget-content ui-corner-all transparent_class" style="top:' + boxTop + 'px; left: ' + boxLeft + 'px; width: ' + width + 'px; height: ' + height + 'px;"><div class="box-title">' + title + '</div></div>');
+
+        if(!data.editable && !admin) {
+            $('#'+id, '#photo').addClass('non_editable');
+        }
 
         activateResizable(id, phone_data, admin, set_default);
     }
@@ -586,13 +596,14 @@ function initResizable(resizable, phone_data, admin, set_default) {
         var diag_id = 'dialog_' + id;
         var search_box_id = 'search-box_' + id;
         var search_id = 'search-container-' + id;
-        //var title = (thisPhone.settings.button_boxes[id].title ? thisPhone.settings.button_boxes[id].title : '');
         var title = (phone_data.settings.button_boxes[id].title ? phone_data.settings.button_boxes[id].title : '');
+        var editable = phone_data.settings.button_boxes[id].editable;
+        var htmlChecked = editable ? 'checked="CHECKED"' : '';
 
         $('body').append("<div id='" + diag_id + "' style='display:none'><div id='" + diag_id + "-options'></div>");
 
         if (admin) {
-            $('#' + diag_id).prepend("<div><fieldset class='provisioner admin'><legend>Admin Area</legend>" + "<div>Title:&nbsp; <input type='text' id='box_title' class='fancy' style='width:300px;' value='" + title + "' /></div>" + "<div>Filter: <input type='text' id='" + search_box_id + "' class='fancy' style='width:300px;' /></div>" + "<div><div id='" + search_id + "'>" + diag_search + "</div></div></fieldset><div style='clear:both;'/></div>" + "<hr style='clear:both;'/></div></div>");
+            $('#' + diag_id).prepend("<div><fieldset class='provisioner admin'><legend>Admin Area</legend>" + "<div>Title:&nbsp; <input type='text' id='box_title' class='fancy' style='width:300px;' value='" + title + "' /></div>" + "<div>Check this if you want to allow the user to edit this box. <input type='checkbox' id='editable_checkbox'" + htmlChecked + "/></div>" + "<div>Filter: <input type='text' id='" + search_box_id + "' class='fancy' style='width:300px;' /></div>" + "<div><div id='" + search_id + "'>" + diag_search + "</div></div></fieldset><div style='clear:both;'/></div>" + "<hr style='clear:both;'/></div></div>");
 
             $('#' + search_box_id).keyup(function (event) {
                 var id = (($(this).attr('id')).split('_'))[1];
@@ -630,7 +641,9 @@ function initResizable(resizable, phone_data, admin, set_default) {
         var btns = {
             'Save': function () {
                 title = $('#box_title', this).val();
+                editable = $('#editable_checkbox', this).is(':checked');
                 phone_data.settings.button_boxes[id].title = title;
+                phone_data.settings.button_boxes[id].editable = editable;
                 $('#resizable_' + id + ' .box-title').html(title);
                 saveConfig(diag_id, phone_data, set_default);
                 $(this).dialog('destroy').remove();
@@ -860,8 +873,8 @@ function moveResizable(event, phone_data) { //write to db
 
 function addResizable(event, phone_data, admin, set_default) {
     console.log('addResizable');
-    maxId = parseFloat(maxId) + 1;
-    i = maxId;
+    var i = parseFloat($('#photo').dataset('maxId')) + 1;
+    $('#photo').attr('data-maxId', i);
 
     var width = 46,
         height = 20,
