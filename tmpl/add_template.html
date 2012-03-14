@@ -1,35 +1,41 @@
 <div>
-    <div class="inner">
-        <form id="phone-form" action="" method="post" class="niceform">
-            <div style="margin-top: 15px; margin-left: 35px">
-                <label for="template_name">Template Name:</label>
-                <input type="text" name="template_name" id="template_name"></input>
-                <br/>
-                <br/>
-
-                <label for="device_brand">Device Brand:</label>
-                <select style="max-width: 150px" name="brand" id="brand">
-                    {{each(brand, product_list) data.list_model}}
-                        <option id="${brand}" value="${brand}">${brand.charAt(0).toUpperCase() + brand.slice(1)}</option>
-                    {{/each}}
-                </select>
-                <br/>
-                <br/>
-
-                <label for="device_model">Device Model:</label>
-                <select style="width: 150px" name="model_select" id="model_select">
-                    {{each(brand, product_list) data.list_model}}
-                        {{each(product, model_list) product_list}}
-                            <optgroup class="model ${brand}" label="${product}">
-                                {{each(i, model) model_list}}
-                                    <option class="model ${brand}" value="${brand}_${product}_${model}" id="${brand}_${product}_${model}">${model}</option>
-                                {{/each}}
-                            </optgroup>
+    <div class="provisioner_popup">
+        <h1>Create a new template...</h1>
+        <form id="phone-form" action="" method="post">
+            <div class="form_content">
+                <div class="popup_field">
+                    <label for="template_name">Template Name:</label>
+                    <input type="text" name="template_name" id="template_name"></input>
+                </div>
+                <div class="popup_field">
+                    <label for="device_brand">Device Brand:</label>
+                    <select style="max-width: 150px" name="brand" id="brand">
+                        {{each(brand, product_list) data.list_model}}
+                            <option id="${brand}" value="${brand}">${brand.charAt(0).toUpperCase() + brand.slice(1)}</option>
                         {{/each}}
-                    {{/each}}
-                </select>
+                    </select>
+                </div>
+                <div class="popup_field">
+                    <label for="device_model">Device Model:</label>
+                    <select style="width: 150px" name="model_select" id="model_select">
+                        {{each(brand, product_list) data.list_model}}
+                            {{each(product, model_list) product_list}}
+                                <optgroup class="model ${brand}" label="${product}">
+                                    {{each(i, model) model_list}}
+                                        <option class="model ${brand}" value="${brand}_${product}_${model}" id="${brand}_${product}_${model}">${model}</option>
+                                    {{/each}}
+                                </optgroup>
+                            {{/each}}
+                        {{/each}}
+                    </select>
+                </div>
             </div>
-            <div class="clear"></div>
         </form>
+        <div class="btn_wrapper_popup">
+            <a href="javascript:void(0);" class="fancy_button blue" id="add_number_template">Add New Template</a>
+            <a href="javascript:void(0);" class="fancy_button blue" id="cancel">Cancel</a>
+            <div class="clear"/>
+        </div>
+        <div class="clear"/>
     </div>
 </div>

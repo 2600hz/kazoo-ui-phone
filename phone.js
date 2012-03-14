@@ -434,28 +434,23 @@ winkstart.module('voip', 'phone', {
             w = args.data.w,
             h = args.data.h,
             img = args.data.img,
-            add_template_html = THIS.templates.new_template.tmpl(args);
+            add_template_html = THIS.templates.new_template.tmpl(args),
+            popup = $(add_template_html).dialog({
+                width: 400,
+                modal: true,
+                resizable: false,
+                title: 'Add new template'
+            });
 
-        $(add_template_html).dialog({
-            height: 210,
-            width: 400,
-            modal: true,
-            resizable: false,
-            title: 'Add new template',
-            create: function (event, ui) {
-                $('.ui-dialog-buttonpane button').width('auto');
-            },
-            buttons: {
-                'Add New Template': function () {
-                    var val = $('#model_select', add_template_html).val().split('_'); //brand_product_model
-                    addTemplate(w, h, img, val[2], val[1], val[0], $('#template_name', add_template_html).val());
+        $('#add_new_template', add_template_html).click(function() {
+            var val = $('#model_select', add_template_html).val().split('_'); //brand_product_model
+            addTemplate(w, h, img, val[2], val[1], val[0], $('#template_name', add_template_html).val());
 
-                    $(this).dialog('destroy').remove();
-                },
-                'Cancel': function () {
-                    $(this).dialog('destroy').remove();
-                }
-            }
+            $(this).dialog('destroy').remove();
+        });
+
+        $('#cancel', add_template_html).click(function() {
+            $(this).dialog('destroy').remove();
         });
 
         //TODO JR: why brand yealink
