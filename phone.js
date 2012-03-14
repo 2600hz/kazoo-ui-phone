@@ -18,7 +18,8 @@ winkstart.module('voip', 'phone', {
         'phone.save': 'save_phone',
         'template.popup': 'popup_template',
         'phone.edit_popup': 'edit_popup',
-        'phone.render_fields': 'render_fields'
+        'phone.render_fields': 'render_fields',
+        'phone_admin.activate': 'activate'
     },
 
     resources: {
@@ -62,12 +63,21 @@ winkstart.module('voip', 'phone', {
     winkstart.registerResources(this.__whapp, this.config.resources);
 
     if('ui_flags' in winkstart.apps.voip && winkstart.apps.voip.ui_flags.provision_admin) {
-        winkstart.publish('subnav.add', {
+        /*winkstart.publish('subnav.add', {
             whapp: 'voip',
             module: this.__module,
             label: 'Provisioning',
             icon: 'outlet1',
             weight: '99'
+        });*/
+
+        //Dirty hack to get provisioner admin to show up as a whapp
+        winkstart.apps['phone_admin'] = {
+            label: 'Provisioner',
+            icon: 'connectivity'
+        };
+        winkstart.publish('appnav.add', {
+            name: 'phone_admin'
         });
     }
 },
