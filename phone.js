@@ -436,14 +436,14 @@ winkstart.module('voip', 'phone', {
             img = args.data.img,
             add_template_html = THIS.templates.new_template.tmpl(args),
             popup = $(add_template_html).dialog({
-                width: 400,
+                width: '420px',
                 modal: true,
                 resizable: false,
                 title: 'Add new template'
             });
 
         $('#add_new_template', add_template_html).click(function() {
-            var val = $('#model_select', add_template_html).val().split('_'); //brand_product_model
+            var val = $('.model_select:visible', add_template_html).first().val().split('_'); //brand_product_model
             addTemplate(w, h, img, val[2], val[1], val[0], $('#template_name', add_template_html).val());
 
             $(this).dialog('destroy').remove();
@@ -456,14 +456,14 @@ winkstart.module('voip', 'phone', {
         //TODO JR: why brand yealink
         var brand = 'yealink'; // initialization_value
         $('#brand', add_template_html).val(brand);
-        $('.model', add_template_html).not('.' + brand).hide();
-        $('#model_select', add_template_html).val($('.model .' + brand).first().val());
+        $('.model_select', add_template_html).hide();
+        $('#model_select_'+brand, add_template_html).show();
 
-        $('#brand', add_template_html).change(function () {
+        $('#brand', add_template_html).bind('change keyup', function () {
             brand = $(this).val();
-            $('.model', add_template_html).show();
-            $('.model', add_template_html).not('.' + brand).hide();
-            $('#model_select', add_template_html).val($('.model .' + brand).first().val());
+            console.log(brand);
+            $('.model_select', add_template_html).hide();
+            $('#model_select_'+brand, add_template_html).show();
         });
     },
 

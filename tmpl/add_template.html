@@ -1,5 +1,5 @@
 <div>
-    <div class="provisioner_popup">
+    <div class="dialog_popup">
         <h1>Create a new template...</h1>
         <form id="phone-form" action="" method="post">
             <div class="form_content">
@@ -9,7 +9,7 @@
                 </div>
                 <div class="popup_field">
                     <label for="device_brand">Device Brand:</label>
-                    <select style="max-width: 150px" name="brand" id="brand">
+                    <select style="width: 150px;" name="brand" id="brand">
                         {{each(brand, product_list) data.list_model}}
                             <option id="${brand}" value="${brand}">${brand.charAt(0).toUpperCase() + brand.slice(1)}</option>
                         {{/each}}
@@ -17,22 +17,22 @@
                 </div>
                 <div class="popup_field">
                     <label for="device_model">Device Model:</label>
-                    <select style="width: 150px" name="model_select" id="model_select">
-                        {{each(brand, product_list) data.list_model}}
+                    {{each(brand, product_list) data.list_model}}
+                        <select style="width: 150px;" name="model_select" class="model_select" id="model_select_${brand}">
                             {{each(product, model_list) product_list}}
-                                <optgroup class="model ${brand}" label="${product}">
+                                <optgroup label="${product}">
                                     {{each(i, model) model_list}}
-                                        <option class="model ${brand}" value="${brand}_${product}_${model}" id="${brand}_${product}_${model}">${model}</option>
+                                        <option value="${brand}_${product}_${model}" id="${brand}_${product}_${model}">${model}</option>
                                     {{/each}}
                                 </optgroup>
                             {{/each}}
-                        {{/each}}
-                    </select>
+                        </select>
+                    {{/each}}
                 </div>
             </div>
         </form>
         <div class="btn_wrapper_popup">
-            <a href="javascript:void(0);" class="fancy_button blue" id="add_number_template">Add New Template</a>
+            <a href="javascript:void(0);" class="fancy_button blue" id="add_new_template">Add New Template</a>
             <a href="javascript:void(0);" class="fancy_button blue" id="cancel">Cancel</a>
             <div class="clear"/>
         </div>
