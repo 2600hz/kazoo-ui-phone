@@ -446,11 +446,11 @@ winkstart.module('voip', 'phone', {
             var val = $('.model_select:visible', add_template_html).first().val().split('_'); //brand_product_model
             addTemplate(w, h, img, val[2], val[1], val[0], $('#template_name', add_template_html).val());
 
-            $(this).dialog('destroy').remove();
+            popup.dialog('destroy').remove();
         });
 
         $('#cancel', add_template_html).click(function() {
-            $(this).dialog('destroy').remove();
+            popup.dialog('destroy').remove();
         });
 
         //TODO JR: why brand yealink
@@ -598,7 +598,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
         $('body').append("<div id='" + diag_id + "' style='display:none'><div id='" + diag_id + "-options'></div>");
 
         if (admin) {
-            $('#' + diag_id).prepend("<div><fieldset class='provisioner admin'><legend>Admin Area</legend>" + "<div>Title:&nbsp; <input type='text' id='box_title' class='fancy' style='width:300px;' value='" + title + "' /></div>" + "<div>Check this if you want to allow the user to edit this box. <input type='checkbox' id='editable_checkbox'" + htmlChecked + "/></div>" + "<div>Filter: <input type='text' id='" + search_box_id + "' class='fancy' style='width:300px;' /></div>" + "<div><div id='" + search_id + "'>" + diag_search + "</div></div></fieldset><div style='clear:both;'/></div>" + "<hr style='clear:both;'/></div></div>");
+            $('#' + diag_id).prepend("<div><fieldset class='provisioner admin'><legend>Admin Area</legend>" + "<div>Title:&nbsp; <input type='text' id='box_title' class='fancy' style='width:300px;' value='" + title + "' /></div>" + "<div>Check this if you want to allow the user to edit this box. <input type='checkbox' id='editable_checkbox'" + htmlChecked + "/></div>" + "<div>Filter: <input type='text' id='" + search_box_id + "' class='fancy' style='width:300px;' /></div>" + "<div><div class='padding-top:10px;' id='" + search_id + "'>" + diag_search + "</div></div></fieldset><div style='clear:both;'/></div>" + "<hr style='clear:both;'/></div></div>");
 
             $('#' + search_box_id).keyup(function (event) {
                 var id = (($(this).attr('id')).split('_'))[1];
