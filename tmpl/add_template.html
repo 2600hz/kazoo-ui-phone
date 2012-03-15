@@ -7,6 +7,15 @@
                     <label for="template_name">Template Name:</label>
                     <input type="text" name="template_name" id="template_name"></input>
                 </div>
+                {{if data.type}}{{else}}
+                    <div class="popup_field">
+                        <label for="template_type">Template Type:</label>
+                        <select style="width: 150px;" id="template_type">
+                            <option value="global">Global</option>
+                            <option value="local">Local</option>
+                        </select>
+                    </div>
+                {{/if}}
                 <div class="popup_field">
                     <label for="device_brand">Device Brand:</label>
                     <select style="width: 150px;" name="brand" id="brand">

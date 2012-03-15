@@ -1,14 +1,19 @@
 <div>
     <style>
     	#photo{
-    		height: ${thisPhone.image.height}px;
+    		height: ${data.image.height}px;
             max-width: 720px;
-    		width: ${thisPhone.image.width}px;
-    		background-image:url('${thisPhone.image.base64}');
+    		width: ${data.image.width}px;
+    		background-image:url('${data.image.base64}');
     	}
     </style>
     <div class="inner">
         <form id="provision-form" action="" method="post" class="niceform">
+            {{if data.id}}
+                <h1>Edit ${data.type.charAt(0).toUpperCase() + data.type.slice(1)} Template</h1>
+            {{else}}
+                <h1>Create Template</h1>
+            {{/if}}
             <ul class="settings_tabs settings1">
                 <li><a href="javascript:void(0)">Provisioning</a></li>
             </ul>
@@ -20,8 +25,9 @@
                      <div id="main">
                         <div id="text"></div>
                         <div>
-                            Name: <input id="template_description" type="text" value="${thisPhone.name}"></input>
+                            Name: <input id="template_description" type="text" value="${data.name}"></input>
                         </div>
+
                         <div id="photo" class="ui-widget-content ui-corner-all" data-maxId="0"></div>
                         <span id="move_update"></span>
                         <span id="size_update"></span>

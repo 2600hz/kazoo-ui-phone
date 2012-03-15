@@ -1,10 +1,10 @@
 <div id="div_popup">
     <style>
     	#photo{
-    		height: ${phone_data.image.height}px;
+    		height: ${data.image.height}px;
             max-width: 720px;
-    		width: ${phone_data.image.width}px;
-    		background-image:url('${phone_data.image.base64}');
+    		width: ${data.image.width}px;
+    		background-image:url('${data.image.base64}');
     	}
     </style>
     <div class="inner">
@@ -21,7 +21,7 @@
                         <div id="text"></div>
                         {{if isAdmin}}
                             <div>
-                                Name: <input id="template_description" type="text" value="${phone_data.name}"></input>
+                                Name: <input id="template_description" type="text" value="${data.name}"></input>
                             </div>
                         {{/if}}
                         <div id="photo" class="ui-widget-content ui-corner-all"></div>

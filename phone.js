@@ -23,38 +23,64 @@ winkstart.module('voip', 'phone', {
     },
 
     resources: {
-        'phone.update_template': {
-            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}',
+        'phone.update_local_template': {
+            url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}',
             contentType: 'application/json',
             verb: 'POST'
         },
-        'phone.update_template_noimg': {
-            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}?withoutimage=true',
-            contentType: 'application/json',
-            verb: 'POST'
-        },
-        'phone.delete_template': {
-            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}',
+        'phone.delete_local_template': {
+            url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}',
             contentType: 'application/json',
             verb: 'DELETE'
         },
-        'phone.create': {
-           url: '{api_url}/accounts/{account_id}/provisioner_templates',
+        'phone.create_local_template': {
+           url: '{api_url}/accounts/{account_id}/local_provisioner_templates',
+           contentType: 'application/json',
+           verb: 'PUT'
+        },
+        'phone.create_local_template_image': {
+            url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}/image',
+            contentType: 'image/png',
+            verb: 'POST'
+        },
+        'phone.get_local_template': {
+            url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}',
+            contentType: 'application/json',
+            verb: 'GET'
+        },
+        'phone.list_local_template': {
+            url: '{api_url}/accounts/{account_id}/local_provisioner_templates',
+            contentType: 'application/json',
+            verb: 'GET'
+        },
+        /* GLOBAL */
+        'phone.update_global_template': {
+            url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}',
+            contentType: 'application/json',
+            verb: 'POST'
+        },
+        'phone.delete_global_template': {
+            url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}',
+            contentType: 'application/json',
+            verb: 'DELETE'
+        },
+        'phone.create_global_template': {
+           url: '{api_url}/accounts/{account_id}/global_provisioner_templates',
             contentType: 'application/json',
             verb: 'PUT'
         },
-        'phone.get_template': {
-            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}',
+        'phone.create_global_template_image': {
+            url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}/image',
+            contentType: 'application/octet-stream',
+            verb: 'POST'
+        },
+        'phone.get_global_template': {
+            url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}',
             contentType: 'application/json',
             verb: 'GET'
         },
-        'phone.get_template_noimg': {
-            url: '{api_url}/accounts/{account_id}/provisioner_templates/{phone_id}?withoutimage=true',
-            contentType: 'application/json',
-            verb: 'GET'
-        },
-        'phone.list_template': {
-            url: '{api_url}/accounts/{account_id}/provisioner_templates',
+        'phone.list_global_template': {
+            url: '{api_url}/accounts/{account_id}/global_provisioner_templates',
             contentType: 'application/json',
             verb: 'GET'
         }
@@ -85,9 +111,10 @@ winkstart.module('voip', 'phone', {
 {
     save_phone: function(phone_data, args) {
         var thisPhone = phone_data;
+        thisPhone.type = thisPhone.type ? thisPhone.type : 'local';
         if(thisPhone.id) {
             if(args.img) {
-                winkstart.request(true, 'phone.update_template', {
+                winkstart.request(true, 'phone.update_'+thisPhone.type+'_template', {
                         account_id: winkstart.apps['voip'].account_id,
                         api_url: winkstart.apps['voip'].api_url,
                         phone_id: thisPhone.id,
@@ -100,9 +127,8 @@ winkstart.module('voip', 'phone', {
             }
             else {
                 var post_data = thisPhone;
-                delete post_data.image;
-
-                winkstart.request(true, 'phone.update_template_noimg', {
+                delete post_data.image.base64;
+                winkstart.request(true, 'phone.update_'+post_data.type+'_template', {
                         account_id: winkstart.apps['voip'].account_id,
                         api_url: winkstart.apps['voip'].api_url,
                         phone_id: thisPhone.id,
@@ -115,14 +141,25 @@ winkstart.module('voip', 'phone', {
             }
         }
         else {
-            winkstart.request(true, 'phone.create', {
+            var image_data = thisPhone.image.base64;
+            delete thisPhone.image.base64;
+            winkstart.request(true, 'phone.create_'+ thisPhone.type +'_template', {
                     account_id: winkstart.apps['voip'].account_id,
                     api_url: winkstart.apps['voip'].api_url,
                     data: thisPhone
                 },
-                function (_data, status) {
-                    winkstart.publish('phone.edit', { id: _data.data.id });
-                    winkstart.publish('phone.list');
+                function (data, status) {
+                    winkstart.request('phone.create_'+ thisPhone.type +'_template_image', {
+                            account_id: winkstart.apps['voip'].account_id,
+                            api_url: winkstart.apps['voip'].api_url,
+                            phone_id: data.data.id,
+                            data: atob(image_data.split(',')[1])
+                        },
+                        function(_data, status) {
+                            winkstart.publish('phone.edit', { id: data.data.id, type: data.data.type });
+                            winkstart.publish('phone.list');
+                        }
+                    );
                 }
             );
         }
@@ -131,55 +168,73 @@ winkstart.module('voip', 'phone', {
     render_fields: function(parent, provision_data, callback) {
         var THIS = this,
             fields_html;
+            render_function = function(list_templates) {
 
-        winkstart.request(true, 'phone.list_template', {
+            },
+            list_templates = [];
+
+        winkstart.request(true, 'phone.list_local_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url
             },
             function(data, status) {
-                var fields_data = {
-                    data: data.data,
-                    field_data: { selected_id: provision_data.id }
-                };
-
-                fields_html = THIS.templates.fields.tmpl(fields_data);
-
-                // change here
-                $('#dropdown', fields_html).change(function() {
-                    if(confirm("If you change the template, the current provision information will be deleted, Are you sure you want to do that?")) {
-                        provision_data.id = $('#dropdown', fields_html).val();
-                        delete provision_data.template;
-                        delete provision_data.settings;
-                        delete provision_data.search;
-                    }
-                    else {
-                        $('#dropdown', fields_html).val(provision_data.id);
-
-                    }
+                $.each(data.data, function() {
+                    list_templates.push(this);
                 });
-
-                $('#btn_provision_popup', fields_html).click(function() {
-                    var id = $('#dropdown').val();
-
-                    if(id) {
-                        THIS.edit_popup({
-                            id: id,
-                            prevent_box_creation: true,
-                            data: provision_data
+                winkstart.request(true, 'phone.list_global_template', {
+                        account_id: winkstart.apps['voip'].account_id,
+                        api_url: winkstart.apps['voip'].api_url
+                    },
+                    function(data, status) {
+                        $.each(data.data, function() {
+                            list_templates.push(this);
                         });
-                    }
-                    else {
-                        alert('Please select an option from the dropdown');
-                    }
-                });
 
-                (parent)
-                    .empty()
-                    .append(fields_html);
+                        var fields_data = {
+                            data: list_templates,
+                            field_data: { selected_id: provision_data.id }
+                        };
 
-                if(typeof callback == 'function') {
-                    callback();
-                }
+                        fields_html = THIS.templates.fields.tmpl(fields_data);
+
+                        // change here
+                        $('#dropdown', fields_html).change(function() {
+                            if(confirm("If you change the template, the current provision information will be deleted, Are you sure you want to do that?")) {
+                                provision_data.id = $('#dropdown', fields_html).val();
+                                delete provision_data.template;
+                                delete provision_data.settings;
+                                delete provision_data.search;
+                            }
+                            else {
+                                $('#dropdown', fields_html).val(provision_data.id);
+
+                            }
+                        });
+
+                        $('#btn_provision_popup', fields_html).click(function() {
+                            var id = $('#dropdown').val();
+
+                            if(id) {
+                                THIS.edit_popup({
+                                    id: id,
+                                    prevent_box_creation: true,
+                                    data: provision_data
+                                });
+                            }
+                            else {
+                                alert('Please select an option from the dropdown');
+                            }
+                        });
+
+                        (parent)
+                            .empty()
+                            .append(fields_html);
+
+                        if(typeof callback == 'function') {
+                            callback();
+                        }
+                    }
+                );
             }
         );
 
@@ -190,7 +245,7 @@ winkstart.module('voip', 'phone', {
     edit_popup: function (args) {
         var THIS = this;
 
-        winkstart.request(true, 'phone.get_template', {
+        winkstart.request(true, 'phone.get_local_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
@@ -211,7 +266,7 @@ winkstart.module('voip', 'phone', {
                 popup_html = $('<div class="inline_popup"><div class="inline_content"/></div>');
 
                 $('.inline_content', popup_html).html(THIS.templates.phonePopup.tmpl({
-                    phone_data: A
+                    data: A
                 }));
                 var dialog = winkstart.dialog(popup_html, { title: 'Edit Provisioning' });
 
@@ -310,16 +365,18 @@ winkstart.module('voip', 'phone', {
 
     edit_phone: function (args) {
         var THIS = this;
-
-        winkstart.request(true, 'phone.get_template', {
+        args.type = args.type ? args.type : 'local';
+        winkstart.request(true, 'phone.get_'+args.type+'_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
             },
             function(_data, status) {
                 var A = _data.data;
+                A.type = A.type ? A.type : 'local';
+
                 var form_data = {
-                    'thisPhone': A
+                    'data': A
                 };
 
                 $('#phone-view').html(THIS.templates.phone.tmpl(form_data));
@@ -354,7 +411,8 @@ winkstart.module('voip', 'phone', {
 
                 $('.phone-delete').click(function () {
                     winkstart.publish('phone.delete', {
-                        id: args.id
+                        id: args.id,
+                        type: args.type || 'local'
                     });
                 });
 
@@ -378,7 +436,8 @@ winkstart.module('voip', 'phone', {
     },
 
     delete_phone: function (args) {
-        winkstart.request(true, 'phone.delete_template', {
+        args.type = args.type ? args.type : 'local';
+        winkstart.request(true, 'phone.delete_'+args.type+'_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
@@ -393,7 +452,7 @@ winkstart.module('voip', 'phone', {
     /* Builds the generic data list on the left hand side. It's responsible for gathering the data from the server
      * and populating into our standardized data list 'thing'.
      */
-    render_list: function () {
+    /*render_list: function () {
         console.log('render_list');
         var THIS = this;
 
@@ -429,6 +488,89 @@ winkstart.module('voip', 'phone', {
                 $('#phone-listpanel').listpanel(options);
             }
         );
+    },*/
+
+    render_list: function() {
+        var THIS = this,
+            setup_list = function (local_data, global_data) {
+                var templates;
+                function map_crossbar_data(crossbar_data, type){
+                    var new_list = [];
+                    if(crossbar_data.length > 0) {
+                        _.each(crossbar_data, function(elem){
+                            new_list.push({
+                                id: elem.id,
+                                title: elem.name,
+                                type: type
+                            });
+                        });
+                    }
+
+                    return new_list;
+                }
+
+                var options = {};
+                options.label = 'Phone Module';
+                options.identifier = 'phone-module-listview';
+                options.new_entity_label = 'phone';
+
+                templates = [].concat(map_crossbar_data(local_data, 'local'), map_crossbar_data(global_data, 'global'));
+                templates.sort(function(a, b) {
+                    var answer;
+                    a.title.toLowerCase() < b.title.toLowerCase() ? answer = -1 : answer = 1;
+                    return answer;
+                });
+
+                options.data = templates;
+                options.publisher = winkstart.publish;
+                options.notifyMethod = 'phone.edit';
+                options.notifyCreateMethod = 'phone.create';
+                console.log('should display');
+
+                $('#phone-listpanel').empty();
+                $('#phone-listpanel').listpanel(options);
+            };
+
+        if(!('ui_flags' in winkstart.apps['voip']) || !('super_duper_admin' in winkstart.apps.voip['ui_flags']) || winkstart.apps.voip.ui_flags.super_duper_admin === false) {
+            THIS.list_local_templates(function(local_data) {
+                setup_list(local_data.data, []);
+            });
+        }
+        else {
+            THIS.list_global_templates(function(global_data) {
+                THIS.list_local_templates(function(local_data) {
+                    setup_list(local_data.data, global_data.data);
+                });
+            });
+        }
+    },
+
+    list_local_templates: function(callback) {
+        winkstart.getJSON('phone.list_local_template', {
+                crossbar: true,
+                account_id: winkstart.apps['voip'].account_id,
+                api_url: winkstart.apps['voip'].api_url
+            },
+            function(data, status) {
+                if(typeof callback == 'function') {
+                    callback(data);
+                }
+            }
+        );
+    },
+
+    list_global_templates: function(callback) {
+        winkstart.getJSON('phone.list_global_template', {
+                crossbar: true,
+                account_id: winkstart.apps['voip'].account_id,
+                api_url: winkstart.apps['voip'].api_url
+            },
+            function(data, status) {
+                if(typeof callback == 'function') {
+                    callback(data);
+                }
+            }
+        );
     },
 
     create_phone: function () {
@@ -454,7 +596,11 @@ winkstart.module('voip', 'phone', {
 
         $('#add_new_template', add_template_html).click(function() {
             var val = $('.model_select:visible', add_template_html).first().val().split('_'); //brand_product_model
-            addTemplate(w, h, img, val[2], val[1], val[0], $('#template_name', add_template_html).val());
+            var form_data = {
+                name: $('#template_name', add_template_html).val(),
+                type: $('#template_type', add_template_html).val() || 'local'
+            };
+            addTemplate(w, h, img, val[2], val[1], val[0], form_data);
 
             popup.dialog('destroy').remove();
         });
@@ -903,7 +1049,7 @@ function addResizable(event, phone_data, admin, set_default) {
     activateResizable(id, phone_data, admin, set_default);
 }
 
-function addTemplate(w, h, img, mdl, prdt, brnd, name) {
+function addTemplate(w, h, img, mdl, prdt, brnd, form_data) {
     console.log('addTemplate');
     $('#photo').css('width', w)
                .css('height', h)
@@ -911,7 +1057,8 @@ function addTemplate(w, h, img, mdl, prdt, brnd, name) {
     $('.resizable').remove();
 
     var phone_data = {
-        name: name,
+        name: form_data.name,
+        type: form_data.type,
         properties: {
             brand: brnd,
             model: mdl,
@@ -1052,7 +1199,6 @@ function uploadFile(file, totalFiles) {
         $('#upload-status-text').html(message);
     }
 
-    // When the file is done loading, POST to the server.
     reader.onloadend = function (evt) {
         var data = evt.target.result;
         // Make sure the data loaded is long enough to represent a real file.
@@ -1078,6 +1224,10 @@ function uploadFile(file, totalFiles) {
                                 'h': h,
                                 'img': img
                             };
+
+                            if(!('ui_flags' in winkstart.apps['voip']) || !('super_duper_admin' in winkstart.apps.voip['ui_flags']) || winkstart.apps.voip.ui_flags.super_duper_admin === false) {
+                                _data.type = 'local';
+                            }
 
                             winkstart.publish('template.popup', {
                                 data: _data
