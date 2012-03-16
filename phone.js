@@ -40,7 +40,7 @@ winkstart.module('voip', 'phone', {
         },
         'phone.create_local_template_image': {
             url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}/image',
-            contentType: 'image/png',
+            contentType: 'application/base64',
             verb: 'POST'
         },
         'phone.get_local_template': {
@@ -71,7 +71,7 @@ winkstart.module('voip', 'phone', {
         },
         'phone.create_global_template_image': {
             url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}/image',
-            contentType: 'application/octet-stream',
+            contentType: 'application/base64',
             verb: 'POST'
         },
         'phone.get_global_template': {
@@ -153,7 +153,7 @@ winkstart.module('voip', 'phone', {
                             account_id: winkstart.apps['voip'].account_id,
                             api_url: winkstart.apps['voip'].api_url,
                             phone_id: data.data.id,
-                            data: atob(image_data.split(',')[1])
+                            data: image_data
                         },
                         function(_data, status) {
                             winkstart.publish('phone.edit', { id: data.data.id, type: data.data.type });
