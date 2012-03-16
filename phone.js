@@ -153,7 +153,11 @@ winkstart.module('voip', 'phone', {
                             account_id: winkstart.apps['voip'].account_id,
                             api_url: winkstart.apps['voip'].api_url,
                             phone_id: data.data.id,
-                            data: image_data
+                            data: image_data/*,
+                            headers: {
+                                'Content-Type': thisPhone.image.type,
+                                'Content-Transfer-Encoding': 'base64'
+                            }*/
                         },
                         function(_data, status) {
                             winkstart.publish('phone.edit', { id: data.data.id, type: data.data.type });
@@ -1222,7 +1226,8 @@ function uploadFile(file, totalFiles) {
                                 'list_model': jQuery.parseJSON(_data),
                                 'w': w,
                                 'h': h,
-                                'img': img
+                                'img': img,/*
+                                'type': file.type*/
                             };
 
                             if(!('ui_flags' in winkstart.apps['voip']) || !('super_duper_admin' in winkstart.apps.voip['ui_flags']) || winkstart.apps.voip.ui_flags.super_duper_admin === false) {
