@@ -187,20 +187,22 @@ winkstart.module('voip', 'phone', {
             },
             list_templates = [];
 
-        winkstart.request(true, 'phone.list_local_template', {
+        winkstart.request(true, 'phone.list_global_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url
             },
             function(data, status) {
                 $.each(data.data, function() {
+                    this.type = 'global';
                     list_templates.push(this);
                 });
-                winkstart.request(true, 'phone.list_global_template', {
+                winkstart.request(true, 'phone.list_local_template', {
                         account_id: winkstart.apps['voip'].account_id,
                         api_url: winkstart.apps['voip'].api_url
                     },
                     function(data, status) {
                         $.each(data.data, function() {
+                            this.type = 'local';
                             list_templates.push(this);
                         });
 
@@ -259,7 +261,7 @@ winkstart.module('voip', 'phone', {
     edit_popup: function (args) {
         var THIS = this;
 
-        winkstart.request(true, 'phone.get_local_template', {
+        winkstart.request(true, 'phone.get_'+args.data.provision_type+'_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
@@ -278,6 +280,8 @@ winkstart.module('voip', 'phone', {
                 var popup, popup_html;
 
                 popup_html = $('<div class="inline_popup"><div class="inline_content"/></div>');
+
+                A.image.base64 = winkstart.apps.voip.api_url +'/accounts/'+ winkstart.apps.voip.account_id + '/' + A.type + '_provisioner_templates/'+A.id+'/image?auth_token='+winkstart.apps.voip.auth_token;
 
                 $('.inline_content', popup_html).html(THIS.templates.phonePopup.tmpl({
                     data: A
@@ -392,8 +396,6 @@ winkstart.module('voip', 'phone', {
                 var form_data = {
                     'data': A
                 };
-
-                console.log(form_data);
 
                 form_data.data.image.base64 = winkstart.apps.voip.api_url +'/accounts/'+ winkstart.apps.voip.account_id + '/' + A.type + '_provisioner_templates/'+A.id+'/image?auth_token='+winkstart.apps.voip.auth_token;
 

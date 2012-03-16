@@ -7,7 +7,7 @@
     		background-image:url('${data.image.base64}');
     	}
     </style>
-    <div class="inner">
+    <div class="dialog_popup">
         <form id="provision-form" action="" method="post" class="niceform">
             <ul class="settings_tabs settings1">
                 <li><a href="javascript:void(0)">Provisioning</a></li>
@@ -36,18 +36,22 @@
                 </div> <!-- end basic settings -->
 
             </div>
-
             <div class="clear"></div>
 
-            </div>
             <div class="buttons_wrapper">
-                <ul class="buttons">
-                    <li><a class="phone-update save-btn" href="javascript:void(0)">Update</a></li>
+                <ul class="buttons right">
+                    <li>
+                        <a class="phone-update save-btn fancy_button green" href="javascript:void(0)">Update</a>
+                    </li>
                     {{if isAdmin}}
-                        <li><a class="phone-delete delete-btn" href="javascript:void(0)">Delete</a></li>
+                    <li>
+                        <a class="phone-delete delete-btn fancy_button red" href="javascript:void(0)">Delete</a>
+                    </li>
                     {{/if}}
                 </ul>
-
+                <div class="clear"/>
             </div>
+            <div class="clear"/>
         </form>
     </div>
+</div>
