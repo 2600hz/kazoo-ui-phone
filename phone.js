@@ -213,18 +213,18 @@ winkstart.module('voip', 'phone', {
 
                         fields_html = THIS.templates.fields.tmpl(fields_data);
 
-                        // change here
                         $('#dropdown', fields_html).change(function() {
-                            if(confirm("If you change the template, the current provision information will be deleted, Are you sure you want to do that?")) {
-                                provision_data.id = $('#dropdown', fields_html).val();
-                                delete provision_data.template;
-                                delete provision_data.settings;
-                                delete provision_data.search;
-                            }
-                            else {
-                                $('#dropdown', fields_html).val(provision_data.id);
-
-                            }
+                            winkstart.confirm('By changing the device type, your previous settings will be lost. Click OK to continue.',
+                                function() {
+                                    provision_data.id = $('#dropdown', fields_html).val();
+                                    delete provision_data.template;
+                                    delete provision_data.settings;
+                                    delete provision_data.search;
+                                },
+                                function() {
+                                    $('#dropdown', fields_html).val(provision_data.id);
+                                }
+                            );
                         });
 
                         $('#btn_provision_popup', fields_html).click(function() {
@@ -234,7 +234,8 @@ winkstart.module('voip', 'phone', {
                                 THIS.edit_popup({
                                     id: id,
                                     prevent_box_creation: true,
-                                    data: provision_data
+                                    data: provision_data,
+                                    provision_type: $('#dropdown option:selected').dataset('type')
                                 });
                             }
                             else {
@@ -261,7 +262,7 @@ winkstart.module('voip', 'phone', {
     edit_popup: function (args) {
         var THIS = this;
 
-        winkstart.request(true, 'phone.get_'+args.data.provision_type+'_template', {
+        winkstart.request(true, 'phone.get_'+args.provision_type+'_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
@@ -269,6 +270,7 @@ winkstart.module('voip', 'phone', {
             function(_data, status) {
                 var A = $.extend(true, {}, _data.data);
                 var B = $.extend(true, {}, args.data);
+                B.template = B.overrides;
                 var C = $.extend(true, {}, A, B);
 
                 A.template = C.template;
@@ -314,7 +316,10 @@ winkstart.module('voip', 'phone', {
 
                 $('.phone-update', dialog).click(function() {
                     //MAJ object
+                    B.template = B.overrides || B.template;
                     $.extend(args.data, THIS.crazy_clean(B));
+                    args.data.overrides = args.data.template;
+                    delete args.data.template;
 
                     dialog.dialog('destroy').remove()
                 });
