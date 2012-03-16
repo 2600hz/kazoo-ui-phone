@@ -40,8 +40,13 @@ winkstart.module('voip', 'phone', {
         },
         'phone.create_local_template_image': {
             url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}/image',
-            contentType: 'application/base64',
+            contentType: 'application/x-base64',
             verb: 'POST'
+        },
+        'phone.get_local_template_image': {
+            url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}/image',
+            contentType: 'application/json',
+            verb: 'GET'
         },
         'phone.get_local_template': {
             url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}',
@@ -69,9 +74,14 @@ winkstart.module('voip', 'phone', {
             contentType: 'application/json',
             verb: 'PUT'
         },
+        'phone.get_global_template_image': {
+            url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}/image',
+            contentType: 'application/json',
+            verb: 'GET'
+        },
         'phone.create_global_template_image': {
             url: '{api_url}/accounts/{account_id}/global_provisioner_templates/{phone_id}/image',
-            contentType: 'application/base64',
+            contentType: 'application/x-base64',
             verb: 'POST'
         },
         'phone.get_global_template': {
@@ -382,6 +392,10 @@ winkstart.module('voip', 'phone', {
                 var form_data = {
                     'data': A
                 };
+
+                console.log(form_data);
+
+                form_data.data.image.base64 = winkstart.apps.voip.api_url +'/accounts/'+ winkstart.apps.voip.account_id + '/' + A.type + '_provisioner_templates/'+A.id+'/image?auth_token='+winkstart.apps.voip.auth_token;
 
                 $('#phone-view').html(THIS.templates.phone.tmpl(form_data));
 
