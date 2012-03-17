@@ -185,7 +185,10 @@ winkstart.module('voip', 'phone', {
             render_function = function(list_templates) {
 
             },
-            list_templates = [];
+            templates = {
+                list_global_templates: [],
+                list_local_templates: []
+            };
 
         winkstart.request(true, 'phone.list_global_template', {
                 account_id: winkstart.apps['voip'].account_id,
@@ -194,7 +197,7 @@ winkstart.module('voip', 'phone', {
             function(data, status) {
                 $.each(data.data, function() {
                     this.type = 'global';
-                    list_templates.push(this);
+                    templates.list_global_templates.push(this);
                 });
                 winkstart.request(true, 'phone.list_local_template', {
                         account_id: winkstart.apps['voip'].account_id,
@@ -203,11 +206,19 @@ winkstart.module('voip', 'phone', {
                     function(data, status) {
                         $.each(data.data, function() {
                             this.type = 'local';
-                            list_templates.push(this);
+                            templates.list_local_templates.push(this);
                         });
 
+                        if(templates.list_local_templates.length == 0) {
+                            delete templates.list_local_templates;
+                        }
+
+                        if(templates.list_global_templates.length == 0) {
+                            delete templates.list_global_templates;
+                        }
+
                         var fields_data = {
-                            data: list_templates,
+                            data: templates,
                             field_data: { selected_id: provision_data.id }
                         };
 
@@ -270,6 +281,7 @@ winkstart.module('voip', 'phone', {
             function(_data, status) {
                 var A = $.extend(true, {}, _data.data);
                 var B = $.extend(true, {}, args.data);
+                console.log(args.data);
                 B.template = B.overrides;
                 var C = $.extend(true, {}, A, B);
 
@@ -315,13 +327,11 @@ winkstart.module('voip', 'phone', {
                 });
 
                 $('.phone-update', dialog).click(function() {
-                    //MAJ object
-                    B.template = B.overrides || B.template;
                     $.extend(args.data, THIS.crazy_clean(B));
                     args.data.overrides = args.data.template;
                     delete args.data.template;
 
-                    dialog.dialog('destroy').remove()
+                    dialog.dialog('destroy').remove();
                 });
 
                 if(args.prevent_box_creation == undefined || args.prevent_box_creation == false) {
@@ -634,7 +644,6 @@ winkstart.module('voip', 'phone', {
             popup.dialog('destroy').remove();
         });
 
-        //TODO JR: why brand yealink
         var brand = 'yealink'; // initialization_value
         $('#brand', add_template_html).val(brand);
         $('.model_select', add_template_html).hide();
@@ -726,6 +735,7 @@ function saveConfig(diag_id, phone_data, set_default) {
             phone_data.template.data[sec][cat][key][subkey]['value'] = val;
         }
     });
+    console.log(phone_data);
 }
 
 function deleteSingleConfig(target, phone_data) {
@@ -815,7 +825,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
         $('#' + diag_id + '-options').html(temp_content);
 
         var btns = {
-            'Save': function () {
+            'OK': function () {
                 title = $('#box_title', this).val();
                 editable = $('#editable_checkbox', this).is(':checked');
                 phone_data.settings.button_boxes[id].title = title;
@@ -837,8 +847,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
             },
             'Delete': function () {
                 var box = '#resizable_' + id;
-                confirmBox('Are you sure you want to delete this box?', function (confirm) {
-                    if (confirm) {
+                winkstart.confirm('Are you sure you want to delete this box?', function() {
                         $(box).fadeOut(400);
                         var vars = phone_data.settings.button_boxes[id].vars;
                         for (var key in vars) {
@@ -848,9 +857,9 @@ function initResizable(resizable, phone_data, admin, set_default) {
                         if(!set_default) {
                             deleteConfig(diag_id, phone_data);
                         }
+                        popup_hot_spot.dialog('destroy').remove();
                     }
-                });
-                $(this).dialog('destroy').remove();
+                );
             }
         };
 
@@ -858,7 +867,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
             delete btns.Delete;
         }
 
-        $('#' + diag_id).dialog({
+        var popup_hot_spot = $('#' + diag_id).dialog({
             width: 'auto',
             modal: true,
             title: 'Edit Hot Spot',
@@ -909,7 +918,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
                 obj = phone_data.template.data[sec][cat][key];
                 //obj['default_value'] = thisPhone.data == undefined ? '' : thisPhone.data[sec][cat][key]['default_value'];
 
-                $(makeInput(obj, loop, keyRead(key), id, key, cat, sec)).hide().prependTo('#' + diag_id).slideDown('slow');
+                $(makeInput(obj, loop, keyRead(key), id, key, cat, sec, admin)).hide().prependTo('#' + diag_id).slideDown('slow');
 
                 initDialogTrash();
 
@@ -969,6 +978,9 @@ function unsetUsedSearch(id, key, phone_data) {
 
 function makeInput(obj, loop, title, id, key, key2, i, admin, set_default) {
     var all_content = '';
+
+    console.log('WAT');
+    console.log(admin);
 
     for (var subkey in obj) {
         all_content += makeInputHTML(obj[subkey], key2, i, id, key, subkey, set_default);
