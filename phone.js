@@ -112,7 +112,7 @@ winkstart.module('voip', 'phone', {
             label: 'Provisioner',
             icon: 'connectivity'
         };
-        winkstart.publish('appnav.add', {
+        winkstart.publish('whappnav.add', {
             name: 'phone_admin'
         });
     }
