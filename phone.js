@@ -293,7 +293,7 @@ winkstart.module('voip', 'phone', {
 
                 var popup, popup_html;
 
-                popup_html = $('<div class="inline_popup"><div class="inline_content"/></div>');
+                popup_html = $('<div class="inline_popup"><div class="inline_content main_content"/></div>');
 
                 A.image.base64 = winkstart.apps.voip.api_url +'/accounts/'+ winkstart.apps.voip.account_id + '/' + A.type + '_provisioner_templates/'+A.id+'/image?auth_token='+winkstart.apps.voip.auth_token;
 
@@ -878,7 +878,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
         });
 
         //TODO: fix this
-        $('#' + diag_id).css('max-height', '600px'); //setting maxHeight on the dialog was not working properly.
+        //$('#' + diag_id).css('max-height', '600px'); //setting maxHeight on the dialog was not working properly.
         width = 800;
         $('#' + diag_id).css('min-width', width + 'px'); //setting maxHeight on the dialog was not working properly.
 

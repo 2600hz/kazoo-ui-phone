@@ -1,54 +1,61 @@
 <div>
-    <style>
-    	#photo{
-    		height: ${data.image.height}px;
+
+     <style>
+        #photo{
+            height: ${data.image.height}px;
             max-width: 720px;
-    		width: ${data.image.width}px;
-    		background-image:url('${data.image.base64}');
-    	}
+            width: ${data.image.width}px;
+            background-image:url('${data.image.base64}');
+        }
     </style>
-    <div class="inner">
-        <form id="provision-form" action="" method="post" class="niceform">
+
+    <div class="row">
+        <div class="whapp-header">
             {{if data.id}}
                 <h1>Edit ${data.type.charAt(0).toUpperCase() + data.type.slice(1)} Template</h1>
             {{else}}
                 <h1>Create Template</h1>
             {{/if}}
-            <ul class="settings_tabs settings1">
-                <li><a href="javascript:void(0)">Provisioning</a></li>
-            </ul>
-
-            <div class="clear"></div>
-
-            <div class="pane">
-                <div id="basic_settings">
-                     <div id="main">
-                        <div id="text"></div>
-                        <div>
-                            Name: <input id="template_description" type="text" value="${data.name}"></input>
-                        </div>
-
-                        <div id="photo" class="ui-widget-content ui-corner-all" data-maxId="0"></div>
-                        <span id="move_update"></span>
-                        <span id="size_update"></span>
-                        <script>
-                                getExistingResizables(function(data){data = $.parseJSON(data);$.each(data, function(){addExistingResizables(this);});});
-                        </script>
-                    </div>
-
-                    <div class="clear"></div>
-                </div> <!-- end basic settings -->
-
-            </div>
-
-            <div class="clear"></div>
-
-            </div>
-            <div class="buttons_wrapper">
-                <ul class="buttons right">
-                    <li><a class="phone-update fancy_button green" href="javascript:void(0)">Save</a></li>
-                    <li><a class="phone-delete fancy_button red" href="javascript:void(0)">Delete</a></li>
-                </ul>
-            </div>
-        </form>
+        </div>
     </div>
+
+    <div class="row">
+        <ul class="tabs" data-tabs="tabs">
+            <li class="active"><a href="#basic">Basic</a></li>
+        </ul>
+
+         <form id="provision-form" action="" method="post">
+             <div class="pill-content">
+                <div class="active basic_view" id="basic">
+                    <div class="pane">
+                        <div id="basic_settings">
+                             <div id="main">
+                                <div id="text"></div>
+
+                                <div class="clearfix">
+                                    <label for="template_description">Name</label>
+                                    <div class="input">
+                                        <input class="span4" id="template_description" name="" type="text" placeholder="" value="${data.name}" rel="popover" data-content=""/>
+                                    </div>
+                                </div>
+
+                                <div id="photo" class="ui-widget-content ui-corner-all" data-maxId="0"></div>
+                                <span id="move_update"></span>
+                                <span id="size_update"></span>
+                                <script>
+                                    getExistingResizables(function(data){data = $.parseJSON(data);$.each(data, function(){addExistingResizables(this);});});
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </form>
+
+         <div class="buttons-right">
+            <button class="btn danger phone-delete">Delete</button>
+            <button class="btn success phone-update">Save</button>
+        </div>
+    </div>
+
+</div>
