@@ -124,7 +124,7 @@ winkstart.module('voip', 'phone', {
         thisPhone.type = thisPhone.type ? thisPhone.type : 'local';
         if(thisPhone.id) {
             if(args.img) {
-                winkstart.request(true, 'phone.update_'+thisPhone.type+'_template', {
+                winkstart.request('phone.update_' + thisPhone.type + '_template', {
                         account_id: winkstart.apps['voip'].account_id,
                         api_url: winkstart.apps['voip'].api_url,
                         phone_id: thisPhone.id,
@@ -138,7 +138,7 @@ winkstart.module('voip', 'phone', {
             else {
                 var post_data = thisPhone;
                 delete post_data.image.base64;
-                winkstart.request(true, 'phone.update_'+post_data.type+'_template', {
+                winkstart.request('phone.update_' + post_data.type + '_template', {
                         account_id: winkstart.apps['voip'].account_id,
                         api_url: winkstart.apps['voip'].api_url,
                         phone_id: thisPhone.id,
@@ -153,21 +153,17 @@ winkstart.module('voip', 'phone', {
         else {
             var image_data = thisPhone.image.base64;
             delete thisPhone.image.base64;
-            winkstart.request(true, 'phone.create_'+ thisPhone.type +'_template', {
+            winkstart.request('phone.create_' + thisPhone.type + '_template', {
                     account_id: winkstart.apps['voip'].account_id,
                     api_url: winkstart.apps['voip'].api_url,
                     data: thisPhone
                 },
                 function (data, status) {
-                    winkstart.request('phone.create_'+ thisPhone.type +'_template_image', {
+                    winkstart.request('phone.create_' + thisPhone.type + '_template_image', {
                             account_id: winkstart.apps['voip'].account_id,
                             api_url: winkstart.apps['voip'].api_url,
                             phone_id: data.data.id,
-                            data: image_data/*,
-                            headers: {
-                                'Content-Type': thisPhone.image.type,
-                                'Content-Transfer-Encoding': 'base64'
-                            }*/
+                            data: image_data
                         },
                         function(_data, status) {
                             winkstart.publish('phone.edit', { id: data.data.id, type: data.data.type });
@@ -181,16 +177,13 @@ winkstart.module('voip', 'phone', {
 
     render_fields: function(parent, provision_data, callback) {
         var THIS = this,
-            fields_html;
-            render_function = function(list_templates) {
-
-            },
+            fields_html,
             templates = {
                 list_global_templates: [],
                 list_local_templates: []
             };
 
-        winkstart.request(true, 'phone.list_global_template', {
+        winkstart.request('phone.list_global_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url
             },
@@ -199,7 +192,8 @@ winkstart.module('voip', 'phone', {
                     this.type = 'global';
                     templates.list_global_templates.push(this);
                 });
-                winkstart.request(true, 'phone.list_local_template', {
+
+                winkstart.request('phone.list_local_template', {
                         account_id: winkstart.apps['voip'].account_id,
                         api_url: winkstart.apps['voip'].api_url
                     },
@@ -229,6 +223,7 @@ winkstart.module('voip', 'phone', {
                                 function() {
                                     provision_data.id = $('#dropdown', fields_html).val();
                                     delete provision_data.template;
+                                    delete provision_data.overrides;
                                     delete provision_data.settings;
                                     delete provision_data.search;
                                 },
@@ -238,19 +233,20 @@ winkstart.module('voip', 'phone', {
                             );
                         });
 
-                        $('#btn_provision_popup', fields_html).click(function() {
-                            var id = $('#dropdown').val();
+                        $('#btn_provision_popup', fields_html).click(function(ev) {
+                            ev.preventDefault();
+                            var id = $('#dropdown', fields_html).val();
 
                             if(id) {
                                 THIS.edit_popup({
                                     id: id,
                                     prevent_box_creation: true,
                                     data: provision_data,
-                                    provision_type: $('#dropdown option:selected').dataset('type')
+                                    provision_type: $('#dropdown option:selected', fields_html).dataset('type')
                                 });
                             }
                             else {
-                                alert('Please select an option from the dropdown');
+                                winkstart.alert('Please select an option from the dropdown');
                             }
                         });
 
@@ -273,7 +269,7 @@ winkstart.module('voip', 'phone', {
     edit_popup: function (args) {
         var THIS = this;
 
-        winkstart.request(true, 'phone.get_'+args.provision_type+'_template', {
+        winkstart.request('phone.get_'+args.provision_type+'_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
@@ -281,7 +277,6 @@ winkstart.module('voip', 'phone', {
             function(_data, status) {
                 var A = $.extend(true, {}, _data.data);
                 var B = $.extend(true, {}, args.data);
-                console.log(args.data);
                 B.template = B.overrides;
                 var C = $.extend(true, {}, A, B);
 
@@ -293,7 +288,7 @@ winkstart.module('voip', 'phone', {
 
                 var popup, popup_html;
 
-                popup_html = $('<div class="inline_popup"><div class="inline_content main_content"/></div>');
+                popup_html = $('<div class="inline_popup" style="padding-top:10px"><div class="inline_content"/></div>');
 
                 A.image.base64 = winkstart.apps.voip.api_url +'/accounts/'+ winkstart.apps.voip.account_id + '/' + A.type + '_provisioner_templates/'+A.id+'/image?auth_token='+winkstart.apps.voip.auth_token;
 
@@ -399,7 +394,7 @@ winkstart.module('voip', 'phone', {
     edit_phone: function (args) {
         var THIS = this;
         args.type = args.type ? args.type : 'local';
-        winkstart.request(true, 'phone.get_'+args.type+'_template', {
+        winkstart.request('phone.get_' + args.type + '_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
@@ -455,15 +450,6 @@ winkstart.module('voip', 'phone', {
                     A.name = $('#template_description', '#main').val();
                     winkstart.publish('phone.save', A, { img: false });
                 });
-
-                // TODO: Move to Winkstart
-                /*$.ajax({
-                    type: 'GET',
-                    url: 'http://www.provisioner.net/beta/merge_data.php?request=data' + details,
-                    dataType: 'text',
-                    success: function (data) {
-                    }
-                });*/
             }
         );
 
@@ -472,7 +458,7 @@ winkstart.module('voip', 'phone', {
 
     delete_phone: function (args) {
         args.type = args.type ? args.type : 'local';
-        winkstart.request(true, 'phone.delete_'+args.type+'_template', {
+        winkstart.request('phone.delete_' + args.type + '_template', {
                 account_id: winkstart.apps['voip'].account_id,
                 api_url: winkstart.apps['voip'].api_url,
                 phone_id: args.id
@@ -483,47 +469,6 @@ winkstart.module('voip', 'phone', {
             }
         );
     },
-
-    /* Builds the generic data list on the left hand side. It's responsible for gathering the data from the server
-     * and populating into our standardized data list 'thing'.
-     */
-    /*render_list: function () {
-        console.log('render_list');
-        var THIS = this;
-
-        function map_crossbar_data(crossbar_data) {
-            var new_list = [];
-            for (var i in crossbar_data) {
-                new_list.push({
-                    id: crossbar_data[i].id,
-                    title: crossbar_data[i].name
-                });
-            }
-            return new_list;
-        }
-
-        winkstart.request(true, 'phone.list_template', {
-                account_id: winkstart.apps['voip'].account_id,
-                api_url: winkstart.apps['voip'].api_url
-            },
-            function (data, status) {
-                json = data;
-
-                var options = {
-                    'label': 'Phone Module',
-                    'identifier': 'phone-module-listview',
-                    'new_entity_label': 'phone',
-                    'data': map_crossbar_data(json.data),
-                    'publisher': winkstart.publish,
-                    'notifyMethod': 'phone.edit',
-                    'notifyCreateMethod': 'phone.create'
-                };
-
-                $('#phone-listpanel').empty();
-                $('#phone-listpanel').listpanel(options);
-            }
-        );
-    },*/
 
     render_list: function() {
         var THIS = this,
@@ -560,7 +505,6 @@ winkstart.module('voip', 'phone', {
                 options.publisher = winkstart.publish;
                 options.notifyMethod = 'phone.edit';
                 options.notifyCreateMethod = 'phone.create';
-                console.log('should display');
 
                 $('#phone-listpanel').empty();
                 $('#phone-listpanel').listpanel(options);
@@ -622,7 +566,7 @@ winkstart.module('voip', 'phone', {
             h = args.data.h,
             img = args.data.img,
             add_template_html = THIS.templates.new_template.tmpl(args),
-            popup = $(add_template_html).dialog({
+            popup = winkstart.dialog(add_template_html, {
                 width: '420px',
                 modal: true,
                 resizable: false,
@@ -651,15 +595,12 @@ winkstart.module('voip', 'phone', {
 
         $('#brand', add_template_html).bind('change keyup', function () {
             brand = $(this).val();
-            console.log(brand);
             $('.model_select', add_template_html).hide();
             $('#model_select_'+brand, add_template_html).show();
         });
     },
 
     activate: function (data) {
-        console.log('activate');
-
         var THIS = this;
         $('#ws-content').empty();
 
@@ -684,7 +625,6 @@ function ucwords(str) {
 }
 
 function addExistingResizables(data, phone_data, admin, set_default) { //Uses data from DB to add each resizable
-    console.log('addExistingResizables');
     var i = parseFloat(data.id);
     var maxId = parseFloat($('#photo').dataset('maxId'));
 
@@ -713,7 +653,6 @@ function addExistingResizables(data, phone_data, admin, set_default) { //Uses da
 
 /* Saves change made in the GUI inside the thisPhone variable. */
 function saveConfig(diag_id, phone_data, set_default) {
-    console.log('saveConfig: ' + diag_id);
     $('#' + diag_id + '-formdata :input:not(:button)').each(function (index) {
         var id = $(this).attr('data-id'),
             cat = $(this).attr('data-catagory'),
@@ -735,7 +674,6 @@ function saveConfig(diag_id, phone_data, set_default) {
             phone_data.template.data[sec][cat][key][subkey]['value'] = val;
         }
     });
-    console.log(phone_data);
 }
 
 function deleteSingleConfig(target, phone_data) {
@@ -757,7 +695,6 @@ function deleteConfig(diag_id, phone_data) {
 }
 
 function initResizable(resizable, phone_data, admin, set_default) {
-    console.log('initResizable');
     //$('#photo').delegate('.resizable', 'click', function () { //Active Selection Logic for resizable boxes
     (resizable).click(function() {
         var id = (($(this).attr('id')).split('_'))[1],
@@ -779,12 +716,12 @@ function initResizable(resizable, phone_data, admin, set_default) {
         });
         diag_search = searchTerms('', id, phone_data);
 
-        var diag_id = 'dialog_' + id;
-        var search_box_id = 'search-box_' + id;
-        var search_id = 'search-container-' + id;
-        var title = (phone_data.settings.button_boxes[id].title ? phone_data.settings.button_boxes[id].title : '');
-        var editable = phone_data.settings.button_boxes[id].editable;
-        var htmlChecked = editable ? 'checked="CHECKED"' : '';
+        var diag_id = 'dialog_' + id,
+            search_box_id = 'search-box_' + id,
+            search_id = 'search-container-' + id,
+            title = (phone_data.settings.button_boxes[id].title ? phone_data.settings.button_boxes[id].title : ''),
+            editable = phone_data.settings.button_boxes[id].editable,
+            htmlChecked = editable ? 'checked="CHECKED"' : '';
 
         $('body').append("<div id='" + diag_id + "' style='display:none'><div id='" + diag_id + "-options'></div>");
 
@@ -821,7 +758,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
             }
         });
 
-        temp_content = "<form id='" + diag_id + "-formdata' onsubmit='return false;'>" + temp_content + "</form>";
+        temp_content = "<form id='" + diag_id + "-formdata' class='fields_wrapper' onsubmit='return false;'>" + temp_content + "</form>";
         $('#' + diag_id + '-options').html(temp_content);
 
         var btns = {
@@ -869,6 +806,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
 
         var popup_hot_spot = $('#' + diag_id).dialog({
             width: 'auto',
+            zIndex: '20000',
             modal: true,
             title: 'Edit Hot Spot',
             buttons: btns,
@@ -876,11 +814,6 @@ function initResizable(resizable, phone_data, admin, set_default) {
                 $(this).dialog('destroy').remove();
             }
         });
-
-        //TODO: fix this
-        //$('#' + diag_id).css('max-height', '600px'); //setting maxHeight on the dialog was not working properly.
-        width = 800;
-        $('#' + diag_id).css('min-width', width + 'px'); //setting maxHeight on the dialog was not working properly.
 
         if(admin) {
             $('#' + search_id).masonry({
@@ -929,14 +862,12 @@ function initResizable(resizable, phone_data, admin, set_default) {
 }
 
 function keyRead(key) {
-    //console.log('keyRead');
     key_read = key.substring(key.indexOf('|') + 1, key.length);
     key_read = ucwords(key_read.replace(/_/g, ' '));
     return key_read;
 }
 
 function initDialogTrash() {
-    console.log('initDialogTrash');
     $('.provisioner-remove').button({
         icons: {
             primary: 'ui-icon-trash'
@@ -947,7 +878,6 @@ function initDialogTrash() {
 
 //This function generates the buttons, clickable and searchable
 function searchTerms(term, id, phone_data) {
-    console.log('searchTerms');
     var diag_search = '';
     $.each(phone_data.template.data, function (i, data) {
         for (var key2 in data) {
@@ -965,22 +895,17 @@ function searchTerms(term, id, phone_data) {
 }
 
 function setUsedSearch(id, key, phone_data) {
-    console.log('setUsedSearch');
     phone_data.search.used_items[key] = true;
     phone_data.settings.button_boxes[id].vars[key] = true;
 }
 
 function unsetUsedSearch(id, key, phone_data) {
-    console.log('unsetUsedSearch');
     delete phone_data.search.used_items[key];
     delete phone_data.settings.button_boxes[id].vars[key];
 }
 
 function makeInput(obj, loop, title, id, key, key2, i, admin, set_default) {
     var all_content = '';
-
-    console.log('WAT');
-    console.log(admin);
 
     for (var subkey in obj) {
         all_content += makeInputHTML(obj[subkey], key2, i, id, key, subkey, set_default);
@@ -992,7 +917,6 @@ function makeInput(obj, loop, title, id, key, key2, i, admin, set_default) {
 }
 
 function makeInputHTML(obj, cat, sec, id, key, subkey, set_default) {
-    console.log('makeInputHTML');
     saved_value = obj['value'] != undefined ? obj['value'] : obj['default_value'];
 
     //false is user mode (device or template)
@@ -1025,7 +949,6 @@ function makeInputHTML(obj, cat, sec, id, key, subkey, set_default) {
 }
 
 function activateResizable(id, phone_data, admin, set_default) {
-    console.log('activateResizable');
     var selector_id = '#' + id;
     if(admin) {
         $(selector_id).resizable({
@@ -1046,21 +969,18 @@ function activateResizable(id, phone_data, admin, set_default) {
 }
 
 function sizeResizable(event, phone_data) { //write to db
-    console.log('sizeResizable');
     var id = (event.target.id).split('_')[1];
     phone_data.settings.button_boxes[id].w = event.target.clientWidth;
     phone_data.settings.button_boxes[id].h = event.target.clientHeight;
 }
 
 function moveResizable(event, phone_data) { //write to db
-    console.log('moveResizable');
     var id = (event.target.id).split('_')[1];
     phone_data.settings.button_boxes[id].x = event.target.offsetLeft;
     phone_data.settings.button_boxes[id].y = event.target.offsetTop;
 }
 
 function addResizable(event, phone_data, admin, set_default) {
-    console.log('addResizable');
     var i = parseFloat($('#photo').dataset('maxId')) + 1;
     $('#photo').attr('data-maxId', i);
 
@@ -1087,7 +1007,6 @@ function addResizable(event, phone_data, admin, set_default) {
 }
 
 function addTemplate(w, h, img, mdl, prdt, brnd, form_data) {
-    console.log('addTemplate');
     $('#photo').css('width', w)
                .css('height', h)
                .css('background-image', 'url(' + img + ')');
@@ -1117,29 +1036,8 @@ function addTemplate(w, h, img, mdl, prdt, brnd, form_data) {
     winkstart.publish('phone.save', phone_data, {img: true});
 }
 
-function confirmBox(msg, action) {
-    console.log('confirmBox');
-    $('body').prepend('<div id="dialog" title="Basic dialog"><p>' + msg + '</p></div>');
-
-    $('#dialog').dialog({
-        resizable: false,
-        modal: true,
-        buttons: {
-            'OK': function () {
-                action(1);
-                $(this).dialog('close');
-            },
-            'Cancel': function () {
-                action(0);
-                $(this).dialog('close');
-            }
-        }
-    });
-}
-
 // lets do some awesome drag and drop stuff!
 function initDnD() {
-    console.log('initDnD');
     // Add drag handling to target elements
     $('body').attr('id', 'body');
     document.getElementById('body').addEventListener('dragenter', onDragEnter, false);
@@ -1151,19 +1049,16 @@ function initDnD() {
 }
 
 function noopHandler(evt) {
-    console.log('noopHandler');
     evt.stopPropagation();
     evt.preventDefault();
 }
 
 function onDragEnter(evt) {
-    console.log('onDragEnter');
     $('#drop-box-overlay').fadeIn(125);
     $('#drop-box-prompt').fadeIn(125);
 }
 
 function onDragLeave(evt) {
-    console.log('onDragLeave');
     /*
      * We have to double-check the 'leave' event state because this event stupidly
      * gets fired by JavaScript when you mouse over the child of a parent element;
@@ -1179,14 +1074,12 @@ function onDragLeave(evt) {
      * enough acceleration).
      */
     if (evt.pageX < 10 || evt.pageY < 10 || $(window).width() - evt.pageX < 10 || $(window).height() - evt.pageY < 10) {
-        console.log('ondragleave');
         $('#drop-box-overlay').fadeOut(125);
         $('#drop-box-prompt').fadeOut(125);
     }
 }
 
 function onDrop(evt) {
-    console.log('onDrop');
     // Consume the event.
     noopHandler(evt);
 

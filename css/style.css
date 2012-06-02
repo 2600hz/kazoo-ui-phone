@@ -52,7 +52,6 @@
 }
 
 #photo {
-	margin: 10px 300px 0 0;
 	position: relative;
 }
 fieldset.provisioner{
@@ -67,6 +66,7 @@ fieldset.provisioner{
 }
 fieldset.admin{
 	width: 98%;
+    min-width: 700px;
 }
 .provisioner>label, .provisioner>input
 {
@@ -74,13 +74,22 @@ fieldset.admin{
     width: 160px;
     float: left;
     margin-bottom: 10px;
+    color: #555;
 }
 
-.provisioner label
-{
+.provisioner>input[type="checkbox"] {
+    width: 15px;
+}
+
+.provisioner legend {
+    padding: 5px;
+}
+
+.provisioner label {
     text-align: right;
     padding-right: 20px;
 }
+
 .provisioner br
 {
     clear: left;
@@ -89,32 +98,19 @@ fieldset.admin{
 	margin: 5px;
 	background: #FFF;
 	font-size: 13px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
 	border-radius: 5px;
+    padding: 0 40px;
+}
 
+form.fields_wrapper {
+    overflow: auto;
+    max-height: 500px;
 }
-input.fancy{
-	padding: 3px;
-	background-color: #EFEFEF;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#666666), to(#888888));
-	background-image: -webkit-linear-gradient(top, #EEE, #FFF);
-	background-image: -moz-linear-gradient(top, #EEE, #FFF);
-	background-image: -ms-linear-gradient(top, #EEE, #FFF);
-	background-image: -o-linear-gradient(top, #EEE, #FFF);
-	background-image: linear-gradient(top, #EEE, #FFF);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#666666', EndColorStr='#888888');
-	border-radius: 5px;
-	moz-border-radius: 5px;
-	webkit-border-radius: 5px;
-	moz-box-shadow: 0px 1px 0px #f2f2f2;
-	webkit-box-shadow: 0px 1px 0px #f2f2f2;
-	font-family: sans-serif;
-	font-size: 12px;
-	color: #2F2F2F;
-	text-transform: none;
-	text-shadow: 0px -1px 0px #334F71;
+
+.variable-group select {
+    width: 170px;
 }
+
 .box-title {
 	text-align:center;
 	font-weight: bold;
