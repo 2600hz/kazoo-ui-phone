@@ -806,7 +806,7 @@ function initResizable(resizable, phone_data, admin, set_default) {
 
         var popup_hot_spot = $('#' + diag_id).dialog({
             width: 'auto',
-            zIndex: '20000',
+            zIndex: 20000,
             modal: true,
             title: 'Edit Hot Spot',
             buttons: btns,
