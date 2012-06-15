@@ -99,18 +99,13 @@ winkstart.module('voip', 'phone', {
     winkstart.registerResources(this.__whapp, this.config.resources);
 
     if('ui_flags' in winkstart.apps.voip && winkstart.apps.voip.ui_flags.provision_admin) {
-        /*winkstart.publish('subnav.add', {
-            whapp: 'voip',
-            module: this.__module,
-            label: 'Provisioning',
-            icon: 'outlet1',
-            weight: '99'
-        });*/
-
         //Dirty hack to get provisioner admin to show up as a whapp
         winkstart.apps['phone_admin'] = {
             label: 'Provisioner',
-            icon: 'connectivity'
+            icon: 'connectivity',
+            api_url: winkstart.apps['voip'].api_url,
+            account_id: winkstart.apps['voip'].account_id,
+            is_masqueradable: true
         };
         winkstart.publish('whappnav.add', {
             name: 'phone_admin'
