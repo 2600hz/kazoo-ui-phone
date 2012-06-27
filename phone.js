@@ -396,7 +396,7 @@ winkstart.module('voip', 'phone', {
             },
             function(_data, status) {
                 var A = _data.data;
-                A.type = A.type ? A.type : 'local';
+                A.type = args.type;
 
                 var form_data = {
                     'data': A
