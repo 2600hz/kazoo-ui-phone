@@ -1,30 +1,18 @@
 <div>
     <span>
-        <select id="dropdown" name="provision.id">
-            <option value="">-- Not set --</option>
-            {{if data.list_global_templates}}
-                <optgroup label="Global Templates">
-                {{each data.list_global_templates}}
-                    {{if id == field_data.selected_id}}
-                    <option data-type="global" value="${this.id}" selected="selected">${this.name}</option>
-                    {{else}}
-                    <option data-type="global" value="${this.id}">${this.name}</option>
-                    {{/if}}
-                {{/each}}
-                </optgroup>
-            {{/if}}
-            {{if data.list_local_templates}}
-                <optgroup label="Local Templates">
-                {{each data.list_local_templates}}
-                    {{if id == field_data.selected_id}}
-                    <option data-type="local" value="${this.id}" selected="selected">${this.name}</option>
-                    {{else}}
-                    <option data-type="local" value="${this.id}">${this.name}</option>
-                    {{/if}}
-                {{/each}}
-                </optgroup>
-            {{/if}}
+        Model&nbsp;&nbsp;
+        <select id="dropdown_brand" name="provision.endpoint_brand">
+            {{each(brand, v) field_data.brands}}
+                <option value="${brand}">${brand}</option>
+            {{/each}}
         </select>
-        <button id="btn_provision_popup" class="btn primary">Customize</button>
+
+        {{each(brand, brand_obj) field_data.brands}}
+            <select class="dropdown_family" name="provision.endpoint_family" data-brand="${brand}">
+                {{each(family, family_obj) brand_obj.families}}
+                    <option value="${family}">${family}</option>
+                {{/each}}
+            </select>
+        {{/each}}
     </span>
 </div>

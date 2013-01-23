@@ -157,3 +157,12 @@ form.fields_wrapper {
     color: #29ABE1 !important;
 	font-weight: bold !important;
 }
+
+.provisioner #dropdown_brand {
+    width: 150px;
+}
+
+.provisioner .dropdown_family {
+    float: right;
+    width: 150px;
+}

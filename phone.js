@@ -172,90 +172,44 @@ winkstart.module('voip', 'phone', {
 
     render_fields: function(parent, provision_data, callback) {
         var THIS = this,
-            fields_html,
-            templates = {
-                list_global_templates: [],
-                list_local_templates: []
-            };
+            fields_html;
 
-        winkstart.request('phone.list_global_template', {
-                account_id: winkstart.apps['voip'].account_id,
-                api_url: winkstart.apps['voip'].api_url
-            },
-            function(data, status) {
-                $.each(data.data, function() {
-                    this.type = 'global';
-                    templates.list_global_templates.push(this);
-                });
-
-                winkstart.request('phone.list_local_template', {
-                        account_id: winkstart.apps['voip'].account_id,
-                        api_url: winkstart.apps['voip'].api_url
+        var data = {
+            field_data: {
+                brands: {
+                    'yealink': {
+                        families: {
+                            't3x': {},
+                            't2x': {},
+                            't1x': {}
+                        }
                     },
-                    function(data, status) {
-                        $.each(data.data, function() {
-                            this.type = 'local';
-                            templates.list_local_templates.push(this);
-                        });
-
-                        if(templates.list_local_templates.length == 0) {
-                            delete templates.list_local_templates;
-                        }
-
-                        if(templates.list_global_templates.length == 0) {
-                            delete templates.list_global_templates;
-                        }
-
-                        var fields_data = {
-                            data: templates,
-                            field_data: { selected_id: provision_data.id }
-                        };
-
-                        fields_html = THIS.templates.fields.tmpl(fields_data);
-
-                        $('#dropdown', fields_html).change(function() {
-                            winkstart.confirm('By changing the device type, your previous settings will be lost. Click OK to continue.',
-                                function() {
-                                    provision_data.id = $('#dropdown', fields_html).val();
-                                    delete provision_data.template;
-                                    delete provision_data.overrides;
-                                    delete provision_data.settings;
-                                    delete provision_data.search;
-                                },
-                                function() {
-                                    $('#dropdown', fields_html).val(provision_data.id);
-                                }
-                            );
-                        });
-
-                        $('#btn_provision_popup', fields_html).click(function(ev) {
-                            ev.preventDefault();
-                            var id = $('#dropdown', fields_html).val();
-
-                            if(id) {
-                                THIS.edit_popup({
-                                    id: id,
-                                    prevent_box_creation: true,
-                                    data: provision_data,
-                                    provision_type: $('#dropdown option:selected', fields_html).dataset('type')
-                                });
-                            }
-                            else {
-                                winkstart.alert('Please select an option from the dropdown');
-                            }
-                        });
-
-                        (parent)
-                            .empty()
-                            .append(fields_html);
-
-                        if(typeof callback == 'function') {
-                            callback();
+                    'polycom': {
+                        families: {
+                            'p111': {},
+                            'p222': {},
+                            'p333': {}
                         }
                     }
-                );
+                }
             }
-        );
+        };
+
+        fields_html = THIS.templates.fields.tmpl(data);
+
+        $('.dropdown_family', fields_html).hide();
+        $('#dropdown_brand', fields_html).change(function() {
+            $('.dropdown_family', fields_html).hide();
+            $('.dropdown_family[data-brand="'+$(this).val()+'"]', fields_html).show();
+        });
+
+        (parent)
+            .empty()
+            .append(fields_html);
+
+        if(typeof callback == 'function') {
+            callback();
+        }
 
         /* Nice hack for amplify.publish */
         return false;
