@@ -23,6 +23,11 @@ winkstart.module('voip', 'phone', {
     },
 
     resources: {
+        'phone.list_models': {
+            url: 'http://50.116.5.152/api/phones/',
+            contentType: 'application/json',
+            verb: 'GET'
+        },
         'phone.update_local_template': {
             url: '{api_url}/accounts/{account_id}/local_provisioner_templates/{phone_id}',
             contentType: 'application/json',
@@ -172,44 +177,92 @@ winkstart.module('voip', 'phone', {
 
     render_fields: function(parent, provision_data, callback) {
         var THIS = this,
-            fields_html;
+            parent_provisioner = $('.provisioner', parent),
+            regex_brands = {
+                "00085d": "aastra",
+                "0010bc": "aastra",
+                "00036b": "cisco",
+                "00000c": "cisco",
+                "000142": "cisco",
+                "000143": "cisco",
+                "000163": "cisco",
+                "000164": "cisco",
+                "000196": "cisco",
+                "000197": "cisco",
+                "0001c7": "cisco",
+                "0001c9": "cisco",
+                "000f23": "cisco",
+                "0013c4": "cisco",
+                "0016c8": "cisco",
+                "001818": "cisco",
+                "00175a": "cisco",
+                "001795": "cisco",
+                "001A2f": "cisco",
+                "001c58": "cisco",
+                "001dA2": "cisco",
+                "002155": "cisco",
+                "000e84": "cisco",
+                "000e38": "cisco",
+                "00070e": "cisco",
+                "001bd4": "cisco",
+                "001930": "cisco",
+                "0019aa": "cisco",
+                "001d45": "cisco",
+                "001ef7": "cisco",
+                "000e08": "cisco",
+                "1cdf0f": "cisco",
+                "e05fb9": "cisco",
+                "5475d0": "cisco",
+                "c46413": "cisco",
+                "000Ffd3": "digium",
+                "000b82": "grandstream",
+                "08000f": "mitel",
+                "1045bE": "norphonic",
+                "0050c2": "norphonic",
+                "0004f2": "polycom",
+                "00907a": "polycom",
+                "000413": "snom",
+                "001f9f": "thomson",
+                "00147f": "thomson",
+                "642400": "xorcom",
+                "001565": "yealink"
+            };
 
-        var data = {
-            field_data: {
-                brands: {
-                    'yealink': {
-                        families: {
-                            't3x': {},
-                            't2x': {},
-                            't1x': {}
+        winkstart.request('phone.list_models', {
+            },
+            function(_data_models) {
+                var default_brand = winkstart.config.default_brand || 'yealink',
+                    fields_html = THIS.templates.fields.tmpl({brands: _data_models.data}),
+                    set_value = function(brand_name) {
+                        if(brand_name in _data_models.data) {
+                            $('#dropdown_brand', fields_html).val(brand_name);
+                            $('.dropdown_family', fields_html).hide();
+                            $('.dropdown_family[data-brand="'+brand_name+'"]', fields_html).show();
                         }
-                    },
-                    'polycom': {
-                        families: {
-                            'p111': {},
-                            'p222': {},
-                            'p333': {}
-                        }
+                    };
+
+                set_value(default_brand);
+
+                $('#dropdown_brand', fields_html).click(function() {
+                    set_value($(this).val());
+                });
+
+                $('#mac_address', parent).keyup(function() {
+                    var mac_address = $(this).val();
+                    if(mac_address in regex_brands) {
+                        set_value(regex_brands[mac_address]);
                     }
+                });
+
+                (parent_provisioner)
+                    .empty()
+                    .append(fields_html);
+
+                if(typeof callback == 'function') {
+                    callback();
                 }
             }
-        };
-
-        fields_html = THIS.templates.fields.tmpl(data);
-
-        $('.dropdown_family', fields_html).hide();
-        $('#dropdown_brand', fields_html).change(function() {
-            $('.dropdown_family', fields_html).hide();
-            $('.dropdown_family[data-brand="'+$(this).val()+'"]', fields_html).show();
-        });
-
-        (parent)
-            .empty()
-            .append(fields_html);
-
-        if(typeof callback == 'function') {
-            callback();
-        }
+        );
 
         /* Nice hack for amplify.publish */
         return false;

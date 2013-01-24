@@ -2,15 +2,15 @@
     <span>
         Model&nbsp;&nbsp;
         <select id="dropdown_brand" name="provision.endpoint_brand">
-            {{each(brand, v) field_data.brands}}
-                <option value="${brand}">${brand}</option>
+            {{each(brand, brand_obj) brands}}
+                <option value="${brand}">${brand_obj.name}</option>
             {{/each}}
         </select>
 
-        {{each(brand, brand_obj) field_data.brands}}
+        {{each(brand, brand_obj) brands}}
             <select class="dropdown_family" name="provision.endpoint_family" data-brand="${brand}">
                 {{each(family, family_obj) brand_obj.families}}
-                    <option value="${family}">${family}</option>
+                    <option value="${family}">${family_obj.name}</option>
                 {{/each}}
             </select>
         {{/each}}
