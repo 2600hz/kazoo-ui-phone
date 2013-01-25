@@ -3,14 +3,26 @@
         Model&nbsp;&nbsp;
         <select id="dropdown_brand" name="provision.endpoint_brand">
             {{each(brand, brand_obj) brands}}
-                <option value="${brand}">${brand_obj.name}</option>
+                {{if brand === provision.endpoint_brand}}
+                    <option selected value="${brand}">${brand_obj.name}</option>
+                {{else}}
+                    <option value="${brand}">${brand_obj.name}</option>
+                {{/if}}
             {{/each}}
         </select>
 
         {{each(brand, brand_obj) brands}}
-            <select class="dropdown_family" name="provision.endpoint_family" data-brand="${brand}">
+            <select class="dropdown_family" name="provision.endpoint_model" data-brand="${brand}">
                 {{each(family, family_obj) brand_obj.families}}
-                    <option value="${family}">${family_obj.name}</option>
+                    <optgroup label="${family_obj.name}">
+                        {{each(model, model_obj) family_obj.models}}
+                            {{if model === provision.endpoint_model}}
+                                <option selected id="${model}" data-family="${family}" value="${model}">${model_obj.name}</option>
+                            {{else}}
+                                <option id="${model}" data-family="${family}" value="${model}">${model_obj.name}</option>
+                            {{/if}}
+                        {{/each}}
+                    </optgroup>
                 {{/each}}
             </select>
         {{/each}}

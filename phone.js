@@ -232,18 +232,18 @@ winkstart.module('voip', 'phone', {
             },
             function(_data_models) {
                 var default_brand = winkstart.config.default_brand || 'yealink',
-                    fields_html = THIS.templates.fields.tmpl({brands: _data_models.data}),
-                    set_value = function(brand_name) {
+                    fields_html = THIS.templates.fields.tmpl({provision: provision_data, brands: _data_models.data}),
+                    set_value = function(brand_name, model_name) {
                         if(brand_name in _data_models.data) {
                             $('#dropdown_brand', fields_html).val(brand_name);
                             $('.dropdown_family', fields_html).hide();
-                            $('.dropdown_family[data-brand="'+brand_name+'"]', fields_html).show();
+                            $('.dropdown_family[data-brand="'+brand_name+'"]', fields_html).show()
+                                                                                           .val(model_name);
                         }
                     };
 
-                set_value(default_brand);
-
-                $('#dropdown_brand', fields_html).click(function() {
+                set_value(provision_data.endpoint_brand || default_brand, provision_data.endpoint_model);
+                $('#dropdown_brand', fields_html).change(function() {
                     set_value($(this).val());
                 });
 
