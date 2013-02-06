@@ -24,7 +24,7 @@ winkstart.module('voip', 'phone', {
 
     resources: {
         'phone.list_models': {
-            url: 'http://50.116.5.152/api/phones/',
+            url: winkstart.config.provisioner_url + '/api/phones/',
             contentType: 'application/json',
             verb: 'GET'
         },
