@@ -232,6 +232,7 @@ winkstart.module('voip', 'phone', {
                 endpoint_brand: winkstart.config.default_brand || 'yealink',
                 endpoint_model: winkstart.config.default_model || 't22',
                 time_format: '12',
+                hotline: '',
                 date_format: 'middle-endian'
             };
 
