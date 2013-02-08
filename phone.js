@@ -6,6 +6,7 @@ winkstart.module('voip', 'phone', {
         phonePopup: 'tmpl/phone_popup.html',
         create: 'tmpl/create.html',
         fields: 'tmpl/fields.html',
+        provisioner_tab_content: 'tmpl/provisioner_tab_content.html',
         new_template: 'tmpl/add_template.html'
     },
 
@@ -177,7 +178,7 @@ winkstart.module('voip', 'phone', {
 
     render_fields: function(parent, provision_data, callback) {
         var THIS = this,
-            parent_provisioner = $('.provisioner', parent),
+            parent_provisioner = $('.provisioner-model', parent),
             regex_brands = {
                 "00085d": "aastra",
                 "0010bc": "aastra",
@@ -226,13 +227,20 @@ winkstart.module('voip', 'phone', {
                 "00147f": "thomson",
                 "642400": "xorcom",
                 "001565": "yealink"
+            },
+            default_provision_data = {
+                endpoint_brand: winkstart.config.default_brand || 'yealink',
+                endpoint_model: winkstart.config.default_model || 't22',
+                time_format: '12',
+                date_format: 'middle-endian'
             };
+
+        var provision_data = $.extend(true, default_provision_data, provision_data);
 
         winkstart.request('phone.list_models', {
             },
             function(_data_models) {
-                var default_brand = winkstart.config.default_brand || 'yealink',
-                    fields_html = THIS.templates.fields.tmpl({provision: provision_data, brands: _data_models.data}),
+                var fields_html = THIS.templates.fields.tmpl({provision: provision_data, brands: _data_models.data}),
                     set_value = function(brand_name, model_name) {
                         if(brand_name in _data_models.data) {
                             $('#dropdown_brand', fields_html).val(brand_name);
@@ -242,17 +250,21 @@ winkstart.module('voip', 'phone', {
                         }
                     };
 
-                set_value(provision_data.endpoint_brand || default_brand, provision_data.endpoint_model);
+                set_value(provision_data.endpoint_brand, provision_data.endpoint_model);
                 $('#dropdown_brand', fields_html).change(function() {
                     set_value($(this).val());
                 });
 
                 $('#mac_address', parent).keyup(function() {
-                    var mac_address = $(this).val();
+                    var mac_address = $(this).val().replace(/[^0-9a-fA-F]/g, '');
+
                     if(mac_address in regex_brands) {
                         set_value(regex_brands[mac_address]);
                     }
                 });
+
+                $('ul.tabs', parent).append('<li id="provisioner_tab"><a href="#provisioner_tab_content">Provisioner</a></li>');
+                $('#device-form .pill-content', parent).append(THIS.templates.provisioner_tab_content.tmpl(provision_data));
 
                 (parent_provisioner)
                     .empty()

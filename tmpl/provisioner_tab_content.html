@@ -1,0 +1,39 @@
+<div>
+    <div id="provisioner_tab_content">
+        <div class="clearfix">
+            <label for="time_format">Time Format</label>
+            <div class="input">
+                <select id="time_format" name="provision.time_format" class="medium">
+                    {{if time_format === '12'}}
+                        <option value="12" selected="selected">12h</option>
+                        <option value="24">24h</option>
+                    {{else}}
+                        <option value="24" selected="selected">24h</option>
+                        <option value="12">12h</option>
+                    {{/if}}
+                </select>
+            </div>
+        </div>
+
+        <div class="clearfix">
+            <label for="date_format">Date Format</label>
+            <div class="input">
+                <select id="date_format" name="provision.date_format" class="medium">
+                    {{if date_format === 'little-endian'}}
+                        <option value="little-endian" selected="selected">Day-Month-Year (European)</option>
+                        <option value="middle-endian">Month/Day/Year (US)</option>
+                        <option value="big-endian">Year.Month.Day (China, Japan, ISO8601)</option>
+                    {{else date_format === 'middle-endian'}}
+                        <option value="middle-endian" selected="selected">Month/Day/Year (US)</option>
+                        <option value="little-endian">Day-Month-Year (European)</option>
+                        <option value="big-endian">Year.Month.Day (China, Japan, ISO8601)</option>
+                    {{else date_format === 'big-endian'}}
+                        <option value="big-endian" selected="selected">Year.Month.Day (China, Japan, ISO8601)</option>
+                        <option value="middle-endian">Month/Day/Year (US)</option>
+                        <option value="little-endian">Day-Month-Year (European)</option>
+                    {{/if}}
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
