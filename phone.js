@@ -233,6 +233,10 @@ winkstart.module('voip', 'phone', {
                 endpoint_model: winkstart.config.default_model || 't22',
                 time_format: '12',
                 hotline: '',
+                vlan: {
+                    enable: false,
+                    number: ''
+                },
                 date_format: 'middle-endian'
             };
 

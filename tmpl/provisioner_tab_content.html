@@ -42,5 +42,31 @@
                 <input class="span4" id="hotline" name="provision.hotline" type="text" placeholder="" value="${hotline}"/>
             </div>
         </div>
+
+        <div class="clearfix">
+            <div class="input">
+                <ul class="inputs-list">
+                    <li>
+                        <label>
+                            <span>
+                                {{if vlan.enable == true}}
+                                    <input type="checkbox" id="enabled" name="provision.vlan.enable" checked="checked" />
+                                {{else}}
+                                    <input type="checkbox" id="enabled" name="provision.vlan.enable" />
+                                {{/if}}
+                                <span>Enable VLAN?</span>
+                            </span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="clearfix">
+            <label for="vlan_number">VLAN Number</label>
+            <div class="input">
+                <input class="span4" id="vlan_number" name="provision.vlan.number" type="text" value="${vlan.number}"/>
+            </div>
+        </div>
     </div>
 </div>
