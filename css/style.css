@@ -158,6 +158,6 @@ form.fields_wrapper {
 	font-weight: bold !important;
 }
 
-.provisioner-model select {
+#device-form .provisioner select {
     width: 100px;
 }

@@ -178,7 +178,7 @@ winkstart.module('voip', 'phone', {
 
     render_fields: function(parent, provision_data, callback) {
         var THIS = this,
-            parent_provisioner = $('.provisioner-model', parent),
+            parent_provisioner = $('.provisioner', parent),
             regex_brands = {
                 "00085d": "aastra",
                 "0010bc": "aastra",
