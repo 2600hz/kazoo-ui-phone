@@ -278,6 +278,12 @@ winkstart.module('voip', 'phone', {
                 if(typeof callback == 'function') {
                     callback();
                 }
+            },
+            function() {
+                //If the API fail we should still be able to fail silently and display the device page
+                if(typeof callback === 'function') {
+                    callback();
+                }
             }
         );
 
