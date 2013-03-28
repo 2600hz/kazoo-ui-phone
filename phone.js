@@ -231,6 +231,7 @@ winkstart.module('voip', 'phone', {
             default_provision_data = {
                 endpoint_brand: winkstart.config.default_brand || 'yealink',
                 endpoint_model: winkstart.config.default_model || 't22',
+                voicemail_beep: 1, //ie enabled
                 time_format: '12',
                 hotline: '',
                 vlan: {

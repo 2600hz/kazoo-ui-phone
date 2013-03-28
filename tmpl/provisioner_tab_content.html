@@ -68,5 +68,24 @@
                 <input class="span4" id="vlan_number" name="provision.vlan.number" type="text" value="${vlan.number}"/>
             </div>
         </div>
+
+        <div class="clearfix">
+            <div class="input">
+                <ul class="inputs-list">
+                    <li>
+                        <label>
+                            <span>
+                                {{if voicemail_beep === 0}}
+                                    <input type="checkbox" id="voicemail_beep" name="provision.voicemail_beep" checked="checked" />
+                                {{else}}
+                                    <input type="checkbox" id="voicemail_beep" name="provision.voicemail_beep" />
+                                {{/if}}
+                                <span>Disable new voicemail sound</span>
+                            </span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
