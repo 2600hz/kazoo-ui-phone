@@ -181,14 +181,14 @@ winkstart.module('voip', 'phone', {
     render_account_fields: function(parent, provision_data, callback) {
         var THIS = this,
             default_provision_data = {
-                password: winkstart.random_string(10)
+                admin_password: winkstart.random_string(10)
             },
             provision_data = $.extend(true, default_provision_data, provision_data);
             $fields_html = THIS.templates.provisioner_account_content.tmpl(provision_data),
 
         $fields_html.delegate('.password-provision[type="password"]', 'focus', function() {
             var value = $(this).val();
-            $('<input class="password-provision span4" name="provision.password" type="text"/>').insertBefore($(this)).val(value).focus();
+            $('<input class="password-provision span4" name="provision.admin_password" type="text"/>').insertBefore($(this)).val(value).focus();
             $(this).remove();
         });
 
@@ -197,7 +197,7 @@ winkstart.module('voip', 'phone', {
             if($(this).attr('removing') != 'true') {
                 $(this).attr('removing', 'true');
                 value = $(this).val();
-                $('<input class="password-provision span4" name="provision.password" type="password"/>').insertBefore($(this)).val(value);
+                $('<input class="password-provision span4" name="provision.admin_password" type="password"/>').insertBefore($(this)).val(value);
                 $(this).remove();
             }
         });
