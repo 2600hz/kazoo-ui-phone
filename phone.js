@@ -21,7 +21,6 @@ winkstart.module('voip', 'phone', {
         'template.popup': 'popup_template',
         'phone.edit_popup': 'edit_popup',
         'phone.render_fields': 'render_fields',
-        'phone.render_account_fields': 'render_account_fields',
         'phone_admin.activate': 'activate'
     },
 
@@ -176,41 +175,6 @@ winkstart.module('voip', 'phone', {
                 }
             );
         }
-    },
-
-    render_account_fields: function(parent, provision_data, callback) {
-        var THIS = this,
-            default_provision_data = {
-                admin_password: winkstart.random_string(10)
-            },
-            provision_data = $.extend(true, default_provision_data, provision_data);
-            $fields_html = THIS.templates.provisioner_account_content.tmpl(provision_data),
-
-        $fields_html.delegate('.password-provision[type="password"]', 'focus', function() {
-            var value = $(this).val();
-            $('<input class="password-provision span4" name="provision.admin_password" type="text"/>').insertBefore($(this)).val(value).focus();
-            $(this).remove();
-        });
-
-        $fields_html.delegate('.password-provision[type="text"]', 'blur', function(ev) {
-            var value;
-            if($(this).attr('removing') != 'true') {
-                $(this).attr('removing', 'true');
-                value = $(this).val();
-                $('<input class="password-provision span4" name="provision.admin_password" type="password"/>').insertBefore($(this)).val(value);
-                $(this).remove();
-            }
-        });
-
-        $('ul.tabs', parent).append('<li id="acc_provisioner_tab"><a href="#provisioner_tab_content">Provisioner</a></li>');
-        $('#accounts_manager-form .pill-content', parent).append($fields_html);
-
-        if(typeof callback == 'function') {
-            callback();
-        }
-
-        /* Nice hack for amplify.publish */
-        return false;
     },
 
     render_fields: function(parent, provision_data, callback) {
